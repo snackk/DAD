@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PuppetMaster", "PuppetMaster.csproj", "{B73EF61D-57B3-4271-8966-58B65A4D0D1D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeManager", "NodeManagerService\NodeManager.csproj", "{40D6BDC6-5669-47FB-BEF7-27006810410B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeOperator", "NodeOperator\NodeOperator.csproj", "{B22073B2-59ED-427D-B92A-AEC742B204D7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessCreationService", "ProcessCreationService\ProcessCreationService.csproj", "{5E2DBE75-2BBA-4477-BAE3-4D130932E304}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B73EF61D-57B3-4271-8966-58B65A4D0D1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B73EF61D-57B3-4271-8966-58B65A4D0D1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B73EF61D-57B3-4271-8966-58B65A4D0D1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B73EF61D-57B3-4271-8966-58B65A4D0D1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40D6BDC6-5669-47FB-BEF7-27006810410B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40D6BDC6-5669-47FB-BEF7-27006810410B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40D6BDC6-5669-47FB-BEF7-27006810410B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40D6BDC6-5669-47FB-BEF7-27006810410B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B22073B2-59ED-427D-B92A-AEC742B204D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B22073B2-59ED-427D-B92A-AEC742B204D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B22073B2-59ED-427D-B92A-AEC742B204D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B22073B2-59ED-427D-B92A-AEC742B204D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E2DBE75-2BBA-4477-BAE3-4D130932E304}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E2DBE75-2BBA-4477-BAE3-4D130932E304}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E2DBE75-2BBA-4477-BAE3-4D130932E304}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E2DBE75-2BBA-4477-BAE3-4D130932E304}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
