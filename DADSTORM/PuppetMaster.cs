@@ -18,6 +18,16 @@ namespace DADSTORM
             ChannelServices.RegisterChannel(channel, true);
             pcs = (NodeManagerService)Activator.GetObject(typeof(NodeManagerService),
                 "tcp://localhost:10000/NodeManagerService");
+
+            for (int i = 0; i < 100; i++) {
+                pcs.start(i);
+            }
+
+            for (int i = 0; i < 100; i++)
+            {
+                Console.WriteLine(pcs.status());
+            }
+            System.Console.ReadLine();
         }
     }
 }

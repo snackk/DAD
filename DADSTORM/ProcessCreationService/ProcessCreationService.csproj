@@ -55,6 +55,10 @@
       <Project>{40d6bdc6-5669-47fb-bef7-27006810410b}</Project>
       <Name>NodeManager</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NodeOperator\NodeOperator.csproj">
+      <Project>{b22073b2-59ed-427d-b92a-aec742b204d7}</Project>
+      <Name>NodeOperator</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
