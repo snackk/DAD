@@ -30,11 +30,15 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
         private List<NodeOperator.NodeOperator> nodeOperators { get; set; } = new List<NodeOperator.NodeOperator>();
         private List<Thread> nodeThreads { get; set; } = new List<Thread>();
 
-        public void start(int operator_id)/*If it receives the method to call it would be much simpler*/
+        public void start(int operator_id,string operation)/*If it receives the method to call it would be much simpler*/
         {
             NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operator_id);    /*Probably not going to need to manage NODES*/
             nodeOperators.Add(node);
-            nodeThreads.Add(new Thread(new ThreadStart(node.tryme)));
+
+            Thread t1 = new Thread(new ThreadStart(node.threadRun));
+            nodeThreads.Add(t1);
+            t1.Start();
+       
         }
 
         public void crash(string processname)
@@ -50,15 +54,15 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
 
         public void interval(int operator_id, int x_ms)
         {
-            throw new NotImplementedException();
+             
         }
 
         public string status()
         {
             string status = "";
-            foreach (Thread thread in nodeThreads) {
-                thread.Start();
-                status = "ThreadState: {0}" + thread.ThreadState + System.Environment.NewLine;
+            foreach (NodeOperator.NodeOperator op in nodeOperators) {
+                status+=op.getStatus() + System.Environment.NewLine;
+                
             }
             return status;
         }

@@ -13,6 +13,7 @@ namespace DADSTORM
     {
         static void Main(string[] args)
         {
+
             NodeManagerService pcs;
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
