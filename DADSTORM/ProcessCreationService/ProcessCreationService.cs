@@ -55,7 +55,6 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
 
         public string status()
         {
-            
             string status = "";
             foreach (Thread thread in nodeThreads) {
                 thread.Start();
@@ -63,6 +62,7 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
             }
             return status;
         }
+
 
         public void unfreeze(string processname)
         {
