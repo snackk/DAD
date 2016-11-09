@@ -13,7 +13,7 @@ namespace NodeOperator
     {
         public int nodeN { private set; get; }
         public int portN { private set; get; }
-
+        public string tuple;    
         public string status = "";
 
         public NodeOperator(int operator_id, int port) {
@@ -36,7 +36,23 @@ namespace NodeOperator
             status = "Node nº" + nodeN + " is running.";
             /*Falta executar os tuplos, seja la o que isso for.*/
         }
-        public delegate void func();
+
+        public void uniqThread() {/*TODO*/
+             
+        }       
+        public void countThread() { /*TODO*/
+
+        }
+        public void dupThread() { /*TODO*/
+
+        }
+        public void filterThread() { /*TODO*/
+  
+        }
+        public void customThread() { /*TODO*/
+
+        }
+        
 
 
 

@@ -21,7 +21,7 @@ namespace DADSTORM
                 "tcp://localhost:10000/NodeManagerService");
 
             for (int i = 0; i < 100; i++) {
-                Console.WriteLine(i);
+                System.Console.WriteLine(i);
                 pcs.start(i, "NADA", 11100 + i);
             }
 
@@ -29,9 +29,10 @@ namespace DADSTORM
             {
                 NodeOperator.NodeOperator a = (NodeOperator.NodeOperator)Activator.GetObject(typeof(NodeOperator.NodeOperator),
                     "tcp://localhost:" + 11000 + i + "/Op");
-                Console.WriteLine(a.status);
+                System.Console.WriteLine(a.status);
             }
             System.Console.ReadLine();
         }
     }
+
 }
