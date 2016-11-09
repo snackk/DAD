@@ -5,7 +5,7 @@ namespace NodeManager
 {
     public interface NodeManager
     {
-        void start(int operator_id,String operation);
+        void start(int operator_id,string operation, int operatorPort);
 
         void interval(int operator_id, int x_ms);
 

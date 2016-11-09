@@ -29,13 +29,14 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
 
         private List<NodeOperator.NodeOperator> nodeOperators { get; set; } = new List<NodeOperator.NodeOperator>();
         private List<Thread> nodeThreads { get; set; } = new List<Thread>();
+        private Dictionary<string, Action> opsDic = new Dictionary<string, Action>();   /*TODO - Acabar JOAO*/ 
 
-        public void start(int operator_id,string operation)/*If it receives the method to call it would be much simpler*/
+        public void start(int operator_id,string operation, int operatorPort)/*If it receives the method to call it would be much simpler*/
         {
-            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operator_id);    /*Probably not going to need to manage NODES*/
+            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operator_id, operatorPort);    /*Probably not going to need to manage NODES*/
             nodeOperators.Add(node);
 
-            Thread t1 = new Thread(new ThreadStart(node.threadRun));
+            Thread t1 = new Thread(new ThreadStart(node.runServer));
             nodeThreads.Add(t1);
             t1.Start();
        
@@ -61,7 +62,7 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
         {
             string status = "";
             foreach (NodeOperator.NodeOperator op in nodeOperators) {
-                status+=op.getStatus() + System.Environment.NewLine;
+                status+=op.status + System.Environment.NewLine;
                 
             }
             return status;

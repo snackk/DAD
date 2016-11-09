@@ -3,21 +3,33 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.Runtime.Remoting;
+using System.Runtime.Remoting.Channels;
+using System.Runtime.Remoting.Channels.Tcp;
 
 namespace NodeOperator
 {
-    public class NodeOperator
+    public class NodeOperator : MarshalByRefObject
     {
         public int nodeN { private set; get; }
-        
-        public string status;
+        public int portN { private set; get; }
 
-        public NodeOperator(int operator_id) {
+        public string status = "";
+
+        public NodeOperator(int operator_id, int port) {
             nodeN = operator_id;
+            status = nodeN + " is running.";
+            portN = port;
         }
 
-        public string getStatus() {
-            return status;
+        public void runServer()
+        {
+            TcpChannel channel = new TcpChannel(portN);
+            ChannelServices.RegisterChannel(channel, true);
+            RemotingConfiguration.RegisterWellKnownServiceType(
+                typeof(NodeOperator),
+                "Op",
+                WellKnownObjectMode.Singleton);
         }
 
         public void threadRun() {

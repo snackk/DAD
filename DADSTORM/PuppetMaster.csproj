@@ -51,6 +51,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="NodeOperator\NodeOperator.csproj">
+      <Project>{b22073b2-59ed-427d-b92a-aec742b204d7}</Project>
+      <Name>NodeOperator</Name>
+    </ProjectReference>
     <ProjectReference Include="ProcessCreationService\ProcessCreationService.csproj">
       <Project>{5e2dbe75-2bba-4477-bae3-4d130932e304}</Project>
       <Name>ProcessCreationService</Name>
