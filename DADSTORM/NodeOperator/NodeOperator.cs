@@ -9,7 +9,7 @@ namespace NodeOperator
     public class NodeOperator
     {
         public int nodeN { private set; get; }
-        public bool procRunning { private set; get; }
+        
         public string status;
 
         public NodeOperator(int operator_id) {
@@ -17,11 +17,16 @@ namespace NodeOperator
         }
 
         public string getStatus() {
-            return "";
+            return status;
         }
 
-        public void tryme() {
+        public void threadRun() {
             status = "Node nº" + nodeN + " is running.";
+            /*Falta executar os tuplos, seja la o que isso for.*/
         }
+        public delegate void func();
+
+
+
     }
 }
