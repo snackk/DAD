@@ -21,8 +21,9 @@ namespace DADSTORM
                 "tcp://localhost:10000/NodeManagerService");
 
             for (int i = 0; i < 100; i++) {
-                Console.WriteLine(i);
-                pcs.start(i, "NADA", 11100 + i);
+                int a = 11000 + i;
+                Console.WriteLine(a);
+                pcs.start(i, "NADA", a);
             }
 
             for (int i = 0; i < 100; i++)

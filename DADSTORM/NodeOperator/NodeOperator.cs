@@ -13,7 +13,6 @@ namespace NodeOperator
     {
         public int nodeN { private set; get; }
         public int portN { private set; get; }
-
         public string status = "";
 
         public NodeOperator(int operator_id, int port) {
@@ -24,12 +23,16 @@ namespace NodeOperator
 
         public void runServer()
         {
-            TcpChannel channel = new TcpChannel(portN);
-            ChannelServices.RegisterChannel(channel, true);
-            RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(NodeOperator),
-                "Op",
-                WellKnownObjectMode.Singleton);
+            /*ZONA EXCLUSIVA - nao garante exclusao mutua*/
+            TcpChannel tcpChannel = new TcpChannel(portN);
+
+            WellKnownServiceTypeEntry WKSTE =
+               new WellKnownServiceTypeEntry(typeof(NodeOperator),
+                                             "Op",
+                                             WellKnownObjectMode.Singleton);
+            RemotingConfiguration.RegisterWellKnownServiceType(WKSTE);
+
+            RemotingConfiguration.ApplicationName = "Op" + portN;
         }
 
         public void threadRun() {

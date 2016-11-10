@@ -38,7 +38,9 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
 
             Thread t1 = new Thread(new ThreadStart(node.runServer));
             nodeThreads.Add(t1);
+            
             t1.Start();
+            
        
         }
 
