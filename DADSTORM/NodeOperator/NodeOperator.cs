@@ -39,9 +39,11 @@ namespace NodeOperator
             status = "Node nº" + nodeN + " is running.";
             /*Falta executar os tuplos, seja la o que isso for.*/
         }
-        public delegate void func();
 
-
-
+        public void uniqThread() { }
+        public void countThread() { }
+        public void dupThread() { }
+        public void filterThread() { }
+        public void customThread() { }
     }
 }

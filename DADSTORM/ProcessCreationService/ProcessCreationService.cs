@@ -31,8 +31,6 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
         private List<NodeOperator.NodeOperator> nodeOperators { get; set; } = new List<NodeOperator.NodeOperator>();
         private List<Thread> nodeThreads { get; set; } = new List<Thread>();
 
-        
-
         public void start(int operator_id,string operation, int operatorPort)/*If it receives the method to call it would be much simpler*/
         {
             NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operator_id, operatorPort);    /*Probably not going to need to manage NODES*/
@@ -57,17 +55,14 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
                     t1 = new Thread(new ThreadStart(node.customThread));
                     break;
             }
-
             nodeThreads.Add(t1);
             
             t1.Start();
-            
-       
         }
 
         public void crash(string processname)
         {
-        
+            throw new NotImplementedException();
         }
 
         public void freeze(string processname)
@@ -90,13 +85,9 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
             return status;
         }
 
-
         public void unfreeze(string processname)
         {
             throw new NotImplementedException();
         }
-        
-        
-
     }
 }
