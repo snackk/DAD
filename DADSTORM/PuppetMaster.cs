@@ -1,12 +1,9 @@
 ﻿using ProcessCreationService;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DADSTORM
 {
@@ -32,6 +29,7 @@ namespace DADSTORM
             Console.WriteLine("     crash [OP_ID]");
             Console.WriteLine("     freeze [OP_ID]");
             Console.WriteLine("     unfreeze [OP_ID]");
+            Console.WriteLine();
 
             while (true) {
                 string[] command = Console.ReadLine().Split(null);
