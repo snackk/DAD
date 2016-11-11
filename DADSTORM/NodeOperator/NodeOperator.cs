@@ -12,7 +12,9 @@ namespace NodeOperator
             portN = port;
         }
 
-        public void debug() { }
+        public void debug() {
+            while (true) { }
+        }
         public void uniqThread() { }
         public void countThread() { }
         public void dupThread() { }

@@ -12,48 +12,62 @@ namespace DADSTORM
 {
     class PuppetMaster
     {
+        private static Dictionary<string, NodeManagerService> pcsServers { set; get; } = new Dictionary<string, NodeManagerService>();
+
         static void Main(string[] args)
         {
-
-            NodeManagerService pcs;
+            
+            NodeManagerService pcsLocalhost;
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
-            pcs = (NodeManagerService)Activator.GetObject(typeof(NodeManagerService),
+            pcsLocalhost = (NodeManagerService)Activator.GetObject(typeof(NodeManagerService),
                 "tcp://localhost:10000/NodeManagerService");
 
-            Console.WriteLine("PuppetMaster connected to NodeManager.");
-            /*
-            for (int i = 0; i < 100; i++) {
-                int a = 11000 + i;
-                Console.WriteLine(a);
-                pcs.start(i, "CUSTOM", a);
-            }
+            pcsServers.Add("localhost", pcsLocalhost);
+            Console.WriteLine("PuppetMaster connected to NodeManagerService on localhost.");
+            Console.WriteLine();
+            Console.WriteLine("Available commands are:");
+            Console.WriteLine("     start [OP_ID]");
+            Console.WriteLine("     status [OP_ID]");
+            Console.WriteLine("     crash [OP_ID]");
+            Console.WriteLine("     freeze [OP_ID]");
+            Console.WriteLine("     unfreeze [OP_ID]");
 
-            for (int i = 0; i < 100; i++)
-            {
-                NodeOperator.NodeOperator a = (NodeOperator.NodeOperator)Activator.GetObject(typeof(NodeOperator.NodeOperator),
-                    "tcp://localhost:" + 11000 + i + "/Op");
-                Console.WriteLine(a.status);
-            }
-            System.Console.ReadLine();*/
             while (true) {
-                string command = Console.ReadLine();
-                Regex r = new Regex(@"\d+");
-                Match m = r.Match(command);
+                string[] command = Console.ReadLine().Split(null);
                 int opID = 0;
+                string commandRes = "";
+
+                Regex r = new Regex(@"\d+");
+                Match m = r.Match(command[1]);
+
                 if (m.Success) {
                     opID = Int32.Parse(m.Value);
                 }
-                Regex.Replace(command, "[^0-9]+", string.Empty);
-                switch (command) {
+
+                switch (command[0]) {
+                    
                     case "start":
-                        pcs.start(opID, "", 0);
-                        Console.WriteLine("Created node: " + opID);
+                        commandRes = pcsLocalhost.start(opID);
                         break;
+
                     case "status":
-                        Console.WriteLine(pcs.status(opID));
+                        commandRes = pcsLocalhost.status(opID);
+                        break;
+
+                    case "crash":
+                        commandRes = pcsLocalhost.crash(opID);
+                        break;
+
+                    case "freeze":
+                        commandRes = pcsLocalhost.freeze(opID);
+                        break;
+
+                    case "unfreeze":
+                        commandRes = pcsLocalhost.unfreeze(opID);
                         break;
                 }
+                Console.WriteLine(commandRes);
             }
         }
     }

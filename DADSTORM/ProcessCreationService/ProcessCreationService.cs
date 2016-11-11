@@ -23,20 +23,24 @@ namespace ProcessCreationService
         }
     }
 
-    public class NodeManagerService : MarshalByRefObject, NodeManager.NodeManager
+    public class NodeManagerService : MarshalByRefObject, NodeManager.INodeManager
     {
         private Dictionary<int, NodeOperator.NodeOperator> nodeOperators { get; set; } = new Dictionary<int, NodeOperator.NodeOperator>();
         private Dictionary<int, Thread> nodeThreads { get; set; } = new Dictionary<int, Thread>();
 
-        public void start(int operatorID,string operation, int operatorPort)
+        public string start(int operatorID)//,string operation, int operatorPort)
         {
-            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operatorID, operatorPort);   
+            if (nodeThreads.ContainsKey(operatorID)) {
+                return "node " + operatorID + " already exists!";
+            }
+            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operatorID, 0);   
             nodeOperators.Add(operatorID, node);
 
             Thread t1 = new Thread(new ThreadStart(node.debug));
             //t1.IsBackground = true;
             t1.Start();
             nodeThreads.Add(operatorID, t1);
+            return "node " + operatorID + " is up and running.";
 
             /*
             switch (operation)
@@ -59,31 +63,67 @@ namespace ProcessCreationService
             }*/
         }
 
-        public void crash(int operatorID)
+        public string crash(int operatorID)
         {
-            if (nodeThreads[operatorID].IsAlive)
+            try
+            {
                 nodeThreads[operatorID].Abort();
+                return "node " + operatorID + " was crashed.";
+            }
+            catch (KeyNotFoundException)
+            {
+                return "node " + operatorID + " does not exist!";
+            }
         }
 
-        public void freeze(int operatorID)
+        public string freeze(int operatorID)
         {
-
+            try
+            {
+                if (nodeThreads[operatorID].IsAlive)
+                {
+                    nodeThreads[operatorID].Suspend();
+                    return "node " + operatorID + " is now frozen.";
+                }
+                return "node " + operatorID + " was already frozen.";
+            }
+            catch (KeyNotFoundException)
+            {
+                return "node " + operatorID + " does not exist!";
+            }
         }
 
-        public void interval(int operatorID, int x_ms)
+        public string interval(int operatorID, int x_ms) 
         {
-            //if (nodeThreads[operatorID].IsAlive)
-                //nodeThreads[operatorID].Sleep(x_ms);
+            return "";
         }
 
         public string status(int operatorID)
         {
-            return "Node nº " + operatorID + " is " + nodeThreads[operatorID].ThreadState;
+            try
+            {
+                return "node " + operatorID + " is " + nodeThreads[operatorID].ThreadState;
+            }
+            catch (KeyNotFoundException) {
+                return "node " + operatorID + " does not exist!";
+            }
         }
 
-        public void unfreeze(int operatorID)
+        public string unfreeze(int operatorID)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (nodeThreads[operatorID].IsAlive)
+                {
+                    nodeThreads[operatorID].Resume();
+                    return "node " + operatorID + " is resuming.";
+                }
+                return "node " + operatorID + " is not frozen.";
+            }
+            catch (KeyNotFoundException)
+            {
+                return "node " + operatorID + " does not exist!";
+            }
         }
     }
 }
