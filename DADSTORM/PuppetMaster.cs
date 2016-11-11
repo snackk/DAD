@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DADSTORM
@@ -20,10 +21,12 @@ namespace DADSTORM
             pcs = (NodeManagerService)Activator.GetObject(typeof(NodeManagerService),
                 "tcp://localhost:10000/NodeManagerService");
 
+            Console.WriteLine("PuppetMaster connected to NodeManager.");
+            /*
             for (int i = 0; i < 100; i++) {
                 int a = 11000 + i;
                 Console.WriteLine(a);
-                pcs.start(i, "NADA", a);
+                pcs.start(i, "CUSTOM", a);
             }
 
             for (int i = 0; i < 100; i++)
@@ -32,7 +35,26 @@ namespace DADSTORM
                     "tcp://localhost:" + 11000 + i + "/Op");
                 Console.WriteLine(a.status);
             }
-            System.Console.ReadLine();
+            System.Console.ReadLine();*/
+            while (true) {
+                string command = Console.ReadLine();
+                Regex r = new Regex(@"\d+");
+                Match m = r.Match(command);
+                int opID = 0;
+                if (m.Success) {
+                    opID = Int32.Parse(m.Value);
+                }
+                Regex.Replace(command, "[^0-9]+", string.Empty);
+                switch (command) {
+                    case "start":
+                        pcs.start(opID, "", 0);
+                        Console.WriteLine("Created node: " + opID);
+                        break;
+                    case "status":
+                        Console.WriteLine(pcs.status(opID));
+                        break;
+                }
+            }
         }
     }
 }

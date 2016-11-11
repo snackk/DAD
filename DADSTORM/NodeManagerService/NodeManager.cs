@@ -5,16 +5,16 @@ namespace NodeManager
 {
     public interface NodeManager
     {
-        void start(int operator_id,string operation, int operatorPort);
+        void start(int operatorID, string operation, int operatorPort);
 
-        void interval(int operator_id, int x_ms);
+        void interval(int operatorID, int x_ms);
 
-        string status();
+        string status(int operatorID);
 
-        void crash(string processname);
+        void crash(int operatorID);
 
-        void freeze(string processname);
+        void freeze(int operatorID);
 
-        void unfreeze(string processname);
+        void unfreeze(int operatorID);
     }
 }

@@ -25,18 +25,20 @@ namespace ProcessCreationService
 
     public class NodeManagerService : MarshalByRefObject, NodeManager.NodeManager
     {
-        /*System.Xml.Serialization.XmlSerializer serializer =
-new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ??? Or NodeOperator should not be serialized???*/
+        private Dictionary<int, NodeOperator.NodeOperator> nodeOperators { get; set; } = new Dictionary<int, NodeOperator.NodeOperator>();
+        private Dictionary<int, Thread> nodeThreads { get; set; } = new Dictionary<int, Thread>();
 
-        private List<NodeOperator.NodeOperator> nodeOperators { get; set; } = new List<NodeOperator.NodeOperator>();
-        private List<Thread> nodeThreads { get; set; } = new List<Thread>();
-
-        public void start(int operator_id,string operation, int operatorPort)/*If it receives the method to call it would be much simpler*/
+        public void start(int operatorID,string operation, int operatorPort)
         {
-            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operator_id, operatorPort);    /*Probably not going to need to manage NODES*/
-            nodeOperators.Add(node);
-            Thread t1= null;
+            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operatorID, operatorPort);   
+            nodeOperators.Add(operatorID, node);
 
+            Thread t1 = new Thread(new ThreadStart(node.debug));
+            //t1.IsBackground = true;
+            t1.Start();
+            nodeThreads.Add(operatorID, t1);
+
+            /*
             switch (operation)
             {
                 case "UNIQ":
@@ -54,38 +56,32 @@ new System.Xml.Serialization.XmlSerializer(typeof());  //HELP Is this to use + ?
                 case "CUSTOM":
                     t1 = new Thread(new ThreadStart(node.customThread));
                     break;
-            }
-            nodeThreads.Add(t1);
-            
-            t1.Start();
+            }*/
         }
 
-        public void crash(string processname)
+        public void crash(int operatorID)
         {
-            throw new NotImplementedException();
+            if (nodeThreads[operatorID].IsAlive)
+                nodeThreads[operatorID].Abort();
         }
 
-        public void freeze(string processname)
+        public void freeze(int operatorID)
         {
-            throw new NotImplementedException();
+
         }
 
-        public void interval(int operator_id, int x_ms)
+        public void interval(int operatorID, int x_ms)
         {
-            throw new NotImplementedException();
+            //if (nodeThreads[operatorID].IsAlive)
+                //nodeThreads[operatorID].Sleep(x_ms);
         }
 
-        public string status()
+        public string status(int operatorID)
         {
-            string status = "";
-            foreach (NodeOperator.NodeOperator op in nodeOperators) {
-                status+=op.status + System.Environment.NewLine;
-                
-            }
-            return status;
+            return "Node nº " + operatorID + " is " + nodeThreads[operatorID].ThreadState;
         }
 
-        public void unfreeze(string processname)
+        public void unfreeze(int operatorID)
         {
             throw new NotImplementedException();
         }
