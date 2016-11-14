@@ -6,6 +6,7 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Threading;
+using System.Runtime.Remoting.Messaging;
 
 namespace ProcessCreationService
 {
@@ -30,6 +31,9 @@ namespace ProcessCreationService
         private Dictionary<string, INodeOperator> nodeOperators { get; set; } = new Dictionary<string, INodeOperator>();
         private Dictionary<string, Thread> nodeThreads { get; set; } = new Dictionary<string, Thread>();
         int port = 10;
+
+        public delegate int RemoteAsyncDelegate(int t);
+
         public string start(string operatorID)//,string operation, int operatorPort)
         {
             port++;
@@ -133,14 +137,33 @@ namespace ProcessCreationService
             }*/
 
             /*This is a debug function, it needs to be a assysnc call*/
+            
+
+            
+            
+
+
+
             string v = "";
             foreach(var no in nodeOperators)
             {
-                v += "node nº " + no.Key + " has value: " + no.Value.replicate(10);
+                AsyncCallback asyncCallback = new AsyncCallback(this.CallBack);
+                RemoteAsyncDelegate remoteDel = new RemoteAsyncDelegate(no.Value.replicate);
+                IAsyncResult ar = remoteDel.BeginInvoke(10,
+                                            asyncCallback, null);
+                //v += "node nº " + no.Key + " has value: " + no.Value.replicate(10);
                 
             }
             return v;
 
+        }
+
+        public void CallBack(IAsyncResult ar)
+        {
+            int p = 0;
+            RemoteAsyncDelegate rad = (RemoteAsyncDelegate)((AsyncResult)ar).AsyncDelegate;
+            p = (int)rad.EndInvoke(ar);
+            System.Console.WriteLine("help " + p);
         }
 
         public string unfreeze(string operatorID)

@@ -15,11 +15,16 @@ namespace DADSTORM
         static void Main(string[] args)
         {
 
-            INodeManager pcsLocalhost;
+            INodeManager pcsLocalhost = null;
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
             pcsLocalhost = (INodeManager)Activator.GetObject(typeof(INodeManager),
                 "tcp://localhost:10000/NodeManagerService");
+
+            if (pcsLocalhost == null) {
+                System.Console.WriteLine("Could not locate server.");
+                return;
+            }
 
             pcsServers.Add("localhost", pcsLocalhost);
             Console.WriteLine("PuppetMaster connected to NodeManagerService on localhost.");

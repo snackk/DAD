@@ -47,18 +47,18 @@ namespace NodeOperator
             while (true) { }
         }
 
-        public void nodeCommunication() /*The call should be assyncronosly!!!*/
+        public void nodeCommunication()
         {
-            
             IDictionary prop = new Hashtable();
             prop["name"] = "tcp" + portN;
             prop["port"] = portN;
             TcpChannel channel = new TcpChannel(prop, null, null);
             ChannelServices.RegisterChannel(channel, true);
-            RemotingConfiguration.RegisterWellKnownServiceType(
+            RemotingServices.Marshal(this, "Op");
+            /*RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(INodeOperator),
                 "Op",
-                WellKnownObjectMode.Singleton);/*Singlecall or singleton?*/
+                WellKnownObjectMode.Singleton);*/
         }
 
         public int replicate(int digger)
