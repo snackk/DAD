@@ -51,6 +51,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="NodeManagerService\NodeManager.csproj">
+      <Project>{40D6BDC6-5669-47FB-BEF7-27006810410B}</Project>
+      <Name>NodeManager</Name>
+    </ProjectReference>
     <ProjectReference Include="NodeOperator\NodeOperator.csproj">
       <Project>{b22073b2-59ed-427d-b92a-aec742b204d7}</Project>
       <Name>NodeOperator</Name>

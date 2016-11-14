@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-
-namespace NodeManager
+﻿namespace NodeManager
 {
     public interface INodeManager
     {

@@ -1,4 +1,6 @@
 ﻿using System;
+using NodeOperator;
+using NodeManager;
 using System.Collections.Generic;
 using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
@@ -23,23 +25,30 @@ namespace ProcessCreationService
         }
     }
 
-    public class NodeManagerService : MarshalByRefObject, NodeManager.INodeManager
+    public class NodeManagerService : MarshalByRefObject, INodeManager
     {
-        private Dictionary<string, NodeOperator.NodeOperator> nodeOperators { get; set; } = new Dictionary<string, NodeOperator.NodeOperator>();
+        private Dictionary<string, INodeOperator> nodeOperators { get; set; } = new Dictionary<string, INodeOperator>();
         private Dictionary<string, Thread> nodeThreads { get; set; } = new Dictionary<string, Thread>();
-
+        int port = 10;
         public string start(string operatorID)//,string operation, int operatorPort)
         {
+            port++;
             if (nodeThreads.ContainsKey(operatorID)) {
                 return "node " + operatorID + " already exists!";
             }
-            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operatorID, 0);   
-            nodeOperators.Add(operatorID, node);
+            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operatorID, port);   
 
-            Thread t1 = new Thread(new ThreadStart(node.debug));
-            //t1.IsBackground = true;
+            Thread t1 = new Thread(new ThreadStart(node.nodeCommunication));
             t1.Start();
-            nodeThreads.Add(operatorID, t1);
+            //t1.IsBackground = true;
+            t1.Join();
+            nodeThreads.Add(operatorID, t1);    /*operatorID should be the machine IP*/
+
+            INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator),
+                "tcp://localhost:" + port + "/Op");
+
+            nodeOperators.Add(operatorID, nodeOp);  /*operatorID should be the machine IP*/
+
             return "node " + operatorID + " is up and running.";
 
             /*
@@ -115,13 +124,23 @@ namespace ProcessCreationService
 
         public string status(string operatorID)
         {
-            try
+            /*try
             {
                 return "node " + operatorID + " is " + nodeThreads[operatorID].ThreadState;
             }
             catch (KeyNotFoundException) {
                 return "node " + operatorID + " does not exist!";
+            }*/
+
+            /*This is a debug function, it needs to be a assysnc call*/
+            string v = "";
+            foreach(var no in nodeOperators)
+            {
+                v += "node nº " + no.Key + " has value: " + no.Value.replicate(10);
+                
             }
+            return v;
+
         }
 
         public string unfreeze(string operatorID)

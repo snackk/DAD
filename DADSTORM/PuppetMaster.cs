@@ -1,4 +1,5 @@
-﻿using ProcessCreationService;
+﻿using NodeManager;
+using ProcessCreationService;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Remoting.Channels;
@@ -9,15 +10,15 @@ namespace DADSTORM
 {
     class PuppetMaster
     {
-        private static Dictionary<string, NodeManagerService> pcsServers { set; get; } = new Dictionary<string, NodeManagerService>();
+        private static Dictionary<string, INodeManager> pcsServers { set; get; } = new Dictionary<string, INodeManager>();
 
         static void Main(string[] args)
         {
-            
-            NodeManagerService pcsLocalhost;
+
+            INodeManager pcsLocalhost;
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
-            pcsLocalhost = (NodeManagerService)Activator.GetObject(typeof(NodeManagerService),
+            pcsLocalhost = (INodeManager)Activator.GetObject(typeof(INodeManager),
                 "tcp://localhost:10000/NodeManagerService");
 
             pcsServers.Add("localhost", pcsLocalhost);
