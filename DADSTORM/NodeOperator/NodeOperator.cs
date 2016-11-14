@@ -7,11 +7,11 @@ namespace NodeOperator
 {
     public class NodeOperator : MarshalByRefObject
     {
-        private int nodeN { set; get; }
+        private string nodeName { set; get; }
         private int portN { set; get; }
-
-        public NodeOperator(int operator_id, int port) {
-                nodeN = operator_id;
+        /*Node_Name -> used to create nodeCommunication*/
+        public NodeOperator(string operator_id, int port) {
+            nodeName = operator_id;
                 portN = port;
             }
 

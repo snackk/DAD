@@ -33,39 +33,44 @@ namespace DADSTORM
 
             while (true) {
                 string[] command = Console.ReadLine().Split(null);
-                int opID = 0;
                 string commandRes = "";
+                try
+                {
+                    if (command[1] != "")
+                    {
+                        switch (command[0])
+                        {
 
-                Regex r = new Regex(@"\d+");
-                Match m = r.Match(command[1]);
+                            case "start":
+                                commandRes = pcsLocalhost.start(command[1]);
+                                break;
 
-                if (m.Success) {
-                    opID = Int32.Parse(m.Value);
+                            case "status":
+                                commandRes = pcsLocalhost.status(command[1]);
+                                break;
+
+                            case "interval":
+                                commandRes = pcsLocalhost.interval(command[1],Int32.Parse(command[2]));
+                                break;
+
+                            case "crash":
+                                commandRes = pcsLocalhost.crash(command[1]);
+                                break;
+
+                            case "freeze":
+                                commandRes = pcsLocalhost.freeze(command[1]);
+                                break;
+
+                            case "unfreeze":
+                                commandRes = pcsLocalhost.unfreeze(command[1]);
+                                break;
+                        }
+                        Console.WriteLine(commandRes);
+                    }
                 }
+                catch (IndexOutOfRangeException) {
 
-                switch (command[0]) {
-                    
-                    case "start":
-                        commandRes = pcsLocalhost.start(opID);
-                        break;
-
-                    case "status":
-                        commandRes = pcsLocalhost.status(opID);
-                        break;
-
-                    case "crash":
-                        commandRes = pcsLocalhost.crash(opID);
-                        break;
-
-                    case "freeze":
-                        commandRes = pcsLocalhost.freeze(opID);
-                        break;
-
-                    case "unfreeze":
-                        commandRes = pcsLocalhost.unfreeze(opID);
-                        break;
                 }
-                Console.WriteLine(commandRes);
             }
         }
     }

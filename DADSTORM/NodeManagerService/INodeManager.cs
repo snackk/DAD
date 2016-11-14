@@ -5,16 +5,16 @@ namespace NodeManager
 {
     public interface INodeManager
     {
-        string start(int operatorID);//, string operation, int operatorPort);
+        string start(string operatorID);//, string operation, int operatorPort);
 
-        string interval(int operatorID, int x_ms);
+        string interval(string operatorID, int x_ms);
 
-        string status(int operatorID);
+        string status(string operatorID);
 
-        string crash(int operatorID);
+        string crash(string operatorID);
 
-        string freeze(int operatorID);
+        string freeze(string operatorID);
 
-        string unfreeze(int operatorID);
+        string unfreeze(string operatorID);
     }
 }

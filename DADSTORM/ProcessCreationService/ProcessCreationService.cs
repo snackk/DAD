@@ -25,10 +25,10 @@ namespace ProcessCreationService
 
     public class NodeManagerService : MarshalByRefObject, NodeManager.INodeManager
     {
-        private Dictionary<int, NodeOperator.NodeOperator> nodeOperators { get; set; } = new Dictionary<int, NodeOperator.NodeOperator>();
-        private Dictionary<int, Thread> nodeThreads { get; set; } = new Dictionary<int, Thread>();
+        private Dictionary<string, NodeOperator.NodeOperator> nodeOperators { get; set; } = new Dictionary<string, NodeOperator.NodeOperator>();
+        private Dictionary<string, Thread> nodeThreads { get; set; } = new Dictionary<string, Thread>();
 
-        public string start(int operatorID)//,string operation, int operatorPort)
+        public string start(string operatorID)//,string operation, int operatorPort)
         {
             if (nodeThreads.ContainsKey(operatorID)) {
                 return "node " + operatorID + " already exists!";
@@ -63,7 +63,7 @@ namespace ProcessCreationService
             }*/
         }
 
-        public string crash(int operatorID)
+        public string crash(string operatorID)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace ProcessCreationService
             }
         }
 
-        public string freeze(int operatorID)
+        public string freeze(string operatorID)
         {
             try
             {
@@ -93,12 +93,27 @@ namespace ProcessCreationService
             }
         }
 
-        public string interval(int operatorID, int x_ms) 
-        {
-            return "";
+        public string interval(string operatorID, int x_ms) 
+        {   
+            try
+            {
+                if (nodeThreads[operatorID].IsAlive)
+                {
+                    nodeThreads[operatorID].Suspend();
+
+                    Thread.Sleep(x_ms);
+                    nodeThreads[operatorID].Resume();
+                }
+                
+            }
+            catch (KeyNotFoundException)
+            {
+                return "node " + operatorID + " does not exist!";
+            }
+            return "node " + operatorID + " is frozen for " + x_ms + " seconds.";
         }
 
-        public string status(int operatorID)
+        public string status(string operatorID)
         {
             try
             {
@@ -109,7 +124,7 @@ namespace ProcessCreationService
             }
         }
 
-        public string unfreeze(int operatorID)
+        public string unfreeze(string operatorID)
         {
             try
             {
