@@ -30,7 +30,7 @@ namespace ProcessCreationService
     {
         private Dictionary<string, INodeOperator> nodeOperators { get; set; } = new Dictionary<string, INodeOperator>();
         private Dictionary<string, Thread> nodeThreads { get; set; } = new Dictionary<string, Thread>();
-        int port = 10;
+        int port = 10010;
 
         public delegate int RemoteAsyncDelegate(int t);
 
@@ -40,7 +40,7 @@ namespace ProcessCreationService
             if (nodeThreads.ContainsKey(operatorID)) {
                 return "node " + operatorID + " already exists!";
             }
-            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operatorID, port);   
+            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operatorID, port, null);   
 
             Thread t1 = new Thread(new ThreadStart(node.nodeCommunication));
             t1.Start();
@@ -128,42 +128,13 @@ namespace ProcessCreationService
 
         public string status(string operatorID)
         {
-            /*try
+            try
             {
                 return "node " + operatorID + " is " + nodeThreads[operatorID].ThreadState;
             }
             catch (KeyNotFoundException) {
                 return "node " + operatorID + " does not exist!";
-            }*/
-
-            /*This is a debug function, it needs to be a assysnc call*/
-            
-
-            
-            
-
-
-
-            string v = "";
-            foreach(var no in nodeOperators)
-            {
-                AsyncCallback asyncCallback = new AsyncCallback(this.CallBack);
-                RemoteAsyncDelegate remoteDel = new RemoteAsyncDelegate(no.Value.replicate);
-                IAsyncResult ar = remoteDel.BeginInvoke(10,
-                                            asyncCallback, null);
-                //v += "node nº " + no.Key + " has value: " + no.Value.replicate(10);
-                
-            }
-            return v;
-
-        }
-
-        public void CallBack(IAsyncResult ar)
-        {
-            int p = 0;
-            RemoteAsyncDelegate rad = (RemoteAsyncDelegate)((AsyncResult)ar).AsyncDelegate;
-            p = (int)rad.EndInvoke(ar);
-            System.Console.WriteLine("help " + p);
+            } 
         }
 
         public string unfreeze(string operatorID)
