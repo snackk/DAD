@@ -15,6 +15,8 @@ namespace DADSTORM
 
         static void Main(string[] args)
         {
+            //var v = new DataTypes.ConfigurationFileObject("Test.config"); //Use this to read configuration files.
+            //var v = DataTypes.ConfigurationFileObject.ReadConfig("Test.config"); //or this
 
             INodeManager pcsLocalhost = null;
             TcpChannel channel = new TcpChannel();
@@ -77,71 +79,6 @@ namespace DADSTORM
                 }
                 catch (IndexOutOfRangeException) {
 
-                }
-            }
-        }
-        private void readConfig(string filename)
-        {
-            string[] lines = System.IO.File.ReadAllLines(@filename);
-
-            // Display the file contents by using a foreach loop.
-            foreach (string line in lines)
-            {
-                string[] readLine = line.Split('%');
-                string information = readLine[0];
-                List<DataTypes.ConfigurationData> configurations = new List<DataTypes.ConfigurationData>();
-
-                if (information.Contains("INPUT_OPS"))  //This is a configuration
-                {
-                    DataTypes.ConfigurationData data = new DataTypes.ConfigurationData();
-                    var regex = new Regex(@"\b[\s,]*");
-                    var words = regex.Split(information).Where(x => !string.IsNullOrEmpty(x)).ToList();
-
-                    data.NumberofReplicas = Convert.ToInt32(words[6]);
-                    data.NodeName = words[0];
-                    data.TargetData = words[3];
-                    switch (words[8])
-                    {
-                        case "random":
-                            data.Routing = DataTypes.RoutingType.random;
-                            break;
-                        case "primary":
-                            data.Routing = DataTypes.RoutingType.primary;
-                            break;
-                        default:
-                            data.Routing = DataTypes.RoutingType.hashing;
-                            data.RoutingArg = words[8][8];
-                            break;
-                    }
-                    data.Addresses = new List<string>(data.NumberofReplicas);
-                    for (int i = 0; i < data.NumberofReplicas; i++)
-                    {
-                        data.Addresses.Add(words[words.IndexOf("address") + 1 + i]);
-                    }
-                    int operationIndex = words.IndexOf("spec") + 1;
-                    switch (words[words.IndexOf("spec") + 1])
-                    {
-                        case "FILTER":
-                            data.Operation = DataTypes.OperatorType.filter;
-                            break;
-                        case "CUSTOM":
-                            data.Operation = DataTypes.OperatorType.custom;
-                            break;
-                        case "UNIQ":
-                            data.Operation = DataTypes.OperatorType.uniq;
-                            break;
-                        case "COUNT":
-                            data.Operation = DataTypes.OperatorType.count;
-                            break;
-                    }
-                    data.OperationArgs = new List<string>();
-                    int pos = 1;
-                    string arg;
-                    while (!string.IsNullOrWhiteSpace(arg = words[operationIndex + pos]))
-                    {
-                        data.OperationArgs.Add(arg);
-                    }
-                    configurations.Add(data);
                 }
             }
         }

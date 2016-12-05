@@ -21,6 +21,9 @@ namespace DADSTORM.DataTypes
         count
     }
 
+    /// <summary>
+    /// Class that holds a configuration node of the configuration file.
+    /// </summary>
     class ConfigurationData
     {
         public string NodeName { get; set; }
