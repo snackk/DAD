@@ -20,7 +20,7 @@ namespace ProcessCreationService
             RemotingConfiguration.RegisterWellKnownServiceType(
                 typeof(NodeManagerService),
                 "NodeManagerService",
-                WellKnownObjectMode.Singleton);
+                WellKnownObjectMode.Singleton);/*Singlecall*/
             System.Console.WriteLine("Press <enter> to terminate PCS...");
             System.Console.ReadLine();
         }
@@ -30,11 +30,11 @@ namespace ProcessCreationService
     {
         private Dictionary<string, INodeOperator> nodeOperators { get; set; } = new Dictionary<string, INodeOperator>();
         private Dictionary<string, Thread> nodeThreads { get; set; } = new Dictionary<string, Thread>();
-        int port = 10010;
+        int port = 10010;//debug
 
         public delegate int RemoteAsyncDelegate(int t);
 
-        public string start(string operatorID)//,string operation, int operatorPort)
+        public string start(string operatorID)//DEBUG
         {
             port++;
             if (nodeThreads.ContainsKey(operatorID)) {
@@ -49,9 +49,14 @@ namespace ProcessCreationService
             nodeThreads.Add(operatorID, t1);    /*operatorID should be the machine IP*/
 
             INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator),
-                "tcp://localhost:" + port + "/Op");
+                "tcp://localhost:" + port + "/Op"+port);
 
             nodeOperators.Add(operatorID, nodeOp);  /*operatorID should be the machine IP*/
+
+            AsyncCallback asyncCallback = new AsyncCallback(this.CallBack);
+            RemoteAsyncDelegate remoteDel = new RemoteAsyncDelegate(nodeOp.replicate);
+            IAsyncResult ar = remoteDel.BeginInvoke(port,
+                                        asyncCallback, null);
 
             return "node " + operatorID + " is up and running.";
 
@@ -74,6 +79,14 @@ namespace ProcessCreationService
                     t1 = new Thread(new ThreadStart(node.customThread));
                     break;
             }*/
+        }
+
+        public void CallBack(IAsyncResult ar)
+        {
+            int p = 0;
+            RemoteAsyncDelegate rad = (RemoteAsyncDelegate)((AsyncResult)ar).AsyncDelegate;
+            p = (int)rad.EndInvoke(ar);
+            System.Console.WriteLine("it has returned " + p + " !");
         }
 
         public string crash(string operatorID)

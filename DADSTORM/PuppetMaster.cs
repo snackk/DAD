@@ -17,7 +17,7 @@ namespace DADSTORM
         {
             //var v = new DataTypes.ConfigurationFileObject("Test.config"); //Use this to read configuration files.
             //var v = DataTypes.ConfigurationFileObject.ReadConfig("Test.config"); //or this
-
+            
             INodeManager pcsLocalhost = null;
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
