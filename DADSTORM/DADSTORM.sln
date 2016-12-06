@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PuppetMaster", "PuppetMaster.csproj", "{B73EF61D-57B3-4271-8966-58B65A4D0D1D}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeOperator", "NodeOperator\NodeOperator.csproj", "{B22073B2-59ED-427D-B92A-AEC742B204D7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessCreationService", "ProcessCreationService\ProcessCreationService.csproj", "{5E2DBE75-2BBA-4477-BAE3-4D130932E304}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DADStorm.DataTypes", "..\DADStorm.DataTypes\DADStorm.DataTypes.csproj", "{B4E5A466-E039-426C-A9DE-048F221DF6CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{5E2DBE75-2BBA-4477-BAE3-4D130932E304}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5E2DBE75-2BBA-4477-BAE3-4D130932E304}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5E2DBE75-2BBA-4477-BAE3-4D130932E304}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B4E5A466-E039-426C-A9DE-048F221DF6CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B4E5A466-E039-426C-A9DE-048F221DF6CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B4E5A466-E039-426C-A9DE-048F221DF6CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B4E5A466-E039-426C-A9DE-048F221DF6CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
