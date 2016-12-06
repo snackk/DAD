@@ -15,7 +15,7 @@ namespace DADSTORM
 
         static void Main(string[] args)
         {
-            //var v = new DataTypes.ConfigurationFileObject("Test.config"); //Use this to read configuration files.
+            var v = new DataTypes.ConfigurationFileObject("test.config"); //Use this to read configuration files.
             //var v = DataTypes.ConfigurationFileObject.ReadConfig("Test.config"); //or this
 
             INodeManager pcsLocalhost = null;

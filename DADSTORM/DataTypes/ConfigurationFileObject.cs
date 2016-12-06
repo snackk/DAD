@@ -9,10 +9,16 @@ namespace DADSTORM.DataTypes
 {
     class ConfigurationFileObject
     {
-        public List<ConfigurationData> ConfigurationNodes { get; set; }
+        private const string SplitWordRegexString = @"[^\p{L}0-9\=]*[\p{Z}\(\)\,\""][^\p{L}0-9\=]*";
         public LoggingLevel Logging { get; set; }
         public SemanticsType Semantics { get; set; }
+        public List<ConfigurationData> ConfigurationNodes { get; set; }
+        public List<ConfigScriptLine> Script { get; set; }
 
+        public override string ToString()
+        {
+            return "Logging level: " + Logging.ToDescriptionString() + " | Semantics Type: " + Semantics.ToDescriptionString() + " | Config nodes: " + ConfigurationNodes.Count + " | Script lines: " + Script.Count;
+        }
 
         public ConfigurationFileObject()
         {
@@ -25,6 +31,10 @@ namespace DADSTORM.DataTypes
         /// <param name="filename">The relative or absolute path of the configuration file.</param>
         public ConfigurationFileObject(string filename)
         {
+
+            ConfigurationNodes = new List<ConfigurationData>();
+            Script = new List<ConfigScriptLine>();
+
             string[] lines = System.IO.File.ReadAllLines(@filename);
 
             // Display the file contents by using a foreach loop.
@@ -33,10 +43,13 @@ namespace DADSTORM.DataTypes
                 string[] readLine = line.Split('%');
                 string information = readLine[0];
 
+                Regex regex;
+                List<string> words;
+
                 if (information.Contains("Semantics") || information.Contains("semantics") || information.Contains("LoggingLevel"))
                 {
-                    var regex = new Regex(@"[^\p{L}]*\p{Z}[^\p{L}]*");
-                    var words = regex.Split(information).Where(x => !string.IsNullOrEmpty(x)).ToList();
+                    regex = new Regex(@"[^\p{L}]*\p{Z}[^\p{L}]*");
+                    words = regex.Split(information).Where(x => !string.IsNullOrEmpty(x)).ToList();
                     switch (words[1])
                     {
                         case "at-most-once":
@@ -55,14 +68,14 @@ namespace DADSTORM.DataTypes
                             Logging = DataTypes.LoggingLevel.full;
                             break;
                     }
-
+                    continue;
                 }
 
                 if (information.Contains("INPUT_OPS") || information.Contains("input ops"))  //This is a configuration
                 {
                     DataTypes.ConfigurationData data = new DataTypes.ConfigurationData();
-                    var regex = new Regex(@"[^\p{L}0-9\=]*[\p{Z}\(\)\,\""][^\p{L}0-9\=]*");
-                    var words = regex.Split(information).Where(x => !string.IsNullOrEmpty(x)).ToList();
+                    regex = new Regex(SplitWordRegexString);
+                    words = regex.Split(information).Where(x => !string.IsNullOrEmpty(x)).ToList();
 
                     data.NumberofReplicas = Convert.ToInt32(words[words.IndexOf("fact") + 1]);
                     data.NodeName = words[0];
@@ -114,10 +127,16 @@ namespace DADSTORM.DataTypes
                     }
                     catch (ArgumentOutOfRangeException) { } //it is expected to be out of range
                     ConfigurationNodes.Add(data);
+                    continue;
+                }
+                regex = new Regex(SplitWordRegexString);
+                words = regex.Split(information).Where(x => !string.IsNullOrEmpty(x)).ToList();
+                if (words.Count > 0)
+                {
+                    Script.Add(new ConfigScriptLine(words));
                 }
             }
         }
-
         public static DataTypes.ConfigurationFileObject ReadConfig(string filename)
         {
             return new ConfigurationFileObject(filename);
