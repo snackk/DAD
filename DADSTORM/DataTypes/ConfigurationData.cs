@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DADSTORM.DataTypes
@@ -67,6 +68,23 @@ namespace DADSTORM.DataTypes
         public int RoutingArg { get; set; }
 
         public List<string> Addresses { get; set; }
+
+        public List<string> PCSAddress
+        {
+            get
+            {
+                var ips = new List<string>();
+                var regex = new Regex(@"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}");
+                Addresses.ForEach(i => 
+                {
+                    var m = regex.Match(i);
+                    if (m.Success)
+                        ips.Add(m.Value);
+                });
+
+                return ips;
+            }
+        }
 
         public OperatorType Operation { get; set; }
         public List<string> OperationArgs { get; set; }
