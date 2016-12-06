@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataTypes\ConfigScriptLine.cs" />
     <Compile Include="DataTypes\ConfigurationData.cs" />
     <Compile Include="DataTypes\ConfigurationFileObject.cs" />
     <Compile Include="DataTypes\Logging.cs" />
