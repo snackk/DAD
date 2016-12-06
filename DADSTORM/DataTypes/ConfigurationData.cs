@@ -68,7 +68,7 @@ namespace DADSTORM.DataTypes
         public int RoutingArg { get; set; }
 
         public List<string> Addresses { get; set; }
-
+        
         public List<string> PCSAddress
         {
             get
@@ -80,9 +80,28 @@ namespace DADSTORM.DataTypes
                     var m = regex.Match(i);
                     if (m.Success)
                         ips.Add(m.Value);
+                    else ips.Add("");
                 });
 
                 return ips;
+            }
+        }
+
+        public List<string> PCSPort
+        {
+            get
+            {
+                var ports = new List<string>();
+                var regex = new Regex(@"[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}:(?<port>[0-9]+)/");
+                Addresses.ForEach(i =>
+                {
+                    var m = regex.Match(i);
+                    if (m.Success)
+                        ports.Add(m.Result("${port}"));
+                    else ports.Add("");
+                });
+
+                return ports;
             }
         }
 
