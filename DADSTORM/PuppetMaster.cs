@@ -15,9 +15,10 @@ namespace DADSTORM
 
         static void Main(string[] args)
         {
-            var v = new DataTypes.ConfigurationFileObject("test.config"); //Use this to read configuration files.
+            var configData = new DataTypes.ConfigurationFileObject("test.config"); //Use this to read configuration files.
             //var v = DataTypes.ConfigurationFileObject.ReadConfig("Test.config"); //or this
-            
+            var x = DADStorm.DataTypes.DADTuple.InputFileReader("followers.dat");
+
             INodeManager pcsLocalhost = null;
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
