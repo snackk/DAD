@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataTypes\ConfigScriptLine.cs" />
-    <Compile Include="DataTypes\ConfigurationData.cs" />
     <Compile Include="DataTypes\ConfigurationFileObject.cs" />
     <Compile Include="DataTypes\Logging.cs" />
     <Compile Include="DataTypes\Semantics.cs" />
@@ -56,6 +55,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="DADSTORM.DataTypes\DADStorm.DataTypes.csproj">
+      <Project>{b4e5a466-e039-426c-a9de-048f221df6cc}</Project>
+      <Name>DADStorm.DataTypes</Name>
+    </ProjectReference>
     <ProjectReference Include="NodeManagerService\NodeManager.csproj">
       <Project>{40D6BDC6-5669-47FB-BEF7-27006810410B}</Project>
       <Name>NodeManager</Name>

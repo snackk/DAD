@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NodeOperator", "NodeOperato
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessCreationService", "ProcessCreationService\ProcessCreationService.csproj", "{5E2DBE75-2BBA-4477-BAE3-4D130932E304}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DADStorm.DataTypes", "..\DADStorm.DataTypes\DADStorm.DataTypes.csproj", "{B4E5A466-E039-426C-A9DE-048F221DF6CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DADStorm.DataTypes", "DADSTORM.DataTypes\DADStorm.DataTypes.csproj", "{B4E5A466-E039-426C-A9DE-048F221DF6CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -5,6 +5,8 @@ using System.Runtime.Remoting;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Messaging;
+using DADStorm.DataTypes;
+using System.Linq;
 
 namespace NodeOperator
 {
@@ -30,19 +32,58 @@ namespace NodeOperator
             throw new NotImplementedException();
         }
 
+        List<DADTuple> Input = new List<DADTuple>();
         public void countThread()
         {
+            //HACK for templating:
+            var output = Input.Count;
             throw new NotImplementedException();
         }
 
         public void dupThread()
         {
+            var output = Input;
             throw new NotImplementedException();
+        }
+
+        private enum OperationSymbol
+        {
+            lesser,
+            greater,
+            equals
+        }
+        private OperationSymbol StringToOperation(string input)
+        {
+            switch (input)
+            {
+                case "=": return OperationSymbol.equals;
+                case "<": return OperationSymbol.lesser;
+                case ">": return OperationSymbol.greater;
+                default: throw new InvalidOperationException();
+            }
         }
 
         public void filterThread()
         {
             throw new NotImplementedException();
+            List<string> operargs = new List<string>();
+            int index = Convert.ToInt32(operargs[0]);
+            OperationSymbol oper = StringToOperation(operargs[1]);
+            string value = operargs[2];
+
+            Input.Where(i =>
+            {
+                switch (oper)
+                {
+                    case OperationSymbol.equals:
+                        return i.getIndex(index).Equals(value);
+                    case OperationSymbol.lesser:
+                        return i.getIndex(index).CompareTo(value) < 0;
+                    case OperationSymbol.greater:
+                        return i.getIndex(index).CompareTo(value) > 0;
+                    default: return false;
+                }
+            });
         }
 
         public void customThread()

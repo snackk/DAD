@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DADStorm.DataTypes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -73,7 +74,7 @@ namespace DADSTORM.DataTypes
 
                 if (information.Contains("INPUT_OPS") || information.Contains("input ops"))  //This is a configuration
                 {
-                    DataTypes.ConfigurationData data = new DataTypes.ConfigurationData();
+                    ConfigurationData data = new ConfigurationData();
                     regex = new Regex(SplitWordRegexString);
                     words = regex.Split(information).Where(x => !string.IsNullOrEmpty(x)).ToList();
 
@@ -83,13 +84,13 @@ namespace DADSTORM.DataTypes
                     switch (words[words.IndexOf("routing") + 1])
                     {
                         case "random":
-                            data.Routing = DataTypes.RoutingType.random;
+                            data.Routing = RoutingType.random;
                             break;
                         case "primary":
-                            data.Routing = DataTypes.RoutingType.primary;
+                            data.Routing = RoutingType.primary;
                             break;
                         default:
-                            data.Routing = DataTypes.RoutingType.hashing;
+                            data.Routing = RoutingType.hashing;
                             data.RoutingArg = Convert.ToInt32(words[words.IndexOf("routing") + 2]);
                             break;
                     }
@@ -102,16 +103,16 @@ namespace DADSTORM.DataTypes
                     switch (words[operationIndex])
                     {
                         case "FILTER":
-                            data.Operation = DataTypes.OperatorType.filter;
+                            data.Operation = OperatorType.filter;
                             break;
                         case "CUSTOM":
-                            data.Operation = DataTypes.OperatorType.custom;
+                            data.Operation = OperatorType.custom;
                             break;
                         case "UNIQ":
-                            data.Operation = DataTypes.OperatorType.uniq;
+                            data.Operation = OperatorType.uniq;
                             break;
                         case "COUNT":
-                            data.Operation = DataTypes.OperatorType.count;
+                            data.Operation = OperatorType.count;
                             break;
                     }
                     data.OperationArgs = new List<string>();

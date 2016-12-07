@@ -7,8 +7,8 @@
     <ProjectGuid>{B4E5A466-E039-426C-A9DE-048F221DF6CC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DADStorm.DataTypes</RootNamespace>
-    <AssemblyName>DADStorm.DataTypes</AssemblyName>
+    <RootNamespace>DADSTORM.DataTypes</RootNamespace>
+    <AssemblyName>DADSTORM.DataTypes</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,8 +40,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigurationData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tuple.cs" />
+    <Compile Include="DADTuple.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace DADSTORM.DataTypes
+namespace DADStorm.DataTypes
 {
     public enum RoutingType
     {
@@ -43,22 +43,14 @@ namespace DADSTORM.DataTypes
             DescriptionAttribute[] attributes = (DescriptionAttribute[])val.GetType().GetField(val.ToString()).GetCustomAttributes(typeof(DescriptionAttribute), false);
             return attributes.Length > 0 ? attributes[0].Description : string.Empty;
         }
-        public static string ToDescriptionString(this LoggingLevel val)
-        {
-            DescriptionAttribute[] attributes = (DescriptionAttribute[])val.GetType().GetField(val.ToString()).GetCustomAttributes(typeof(DescriptionAttribute), false);
-            return attributes.Length > 0 ? attributes[0].Description : string.Empty;
-        }
-        public static string ToDescriptionString(this SemanticsType val)
-        {
-            DescriptionAttribute[] attributes = (DescriptionAttribute[])val.GetType().GetField(val.ToString()).GetCustomAttributes(typeof(DescriptionAttribute), false);
-            return attributes.Length > 0 ? attributes[0].Description : string.Empty;
-        }
     }
+
+
 
     /// <summary>
     /// Class that holds a configuration node of the configuration file.
     /// </summary>
-    class ConfigurationData
+    public class ConfigurationData
     {
         public string NodeName { get; set; }
         public string TargetData { get; set; }
