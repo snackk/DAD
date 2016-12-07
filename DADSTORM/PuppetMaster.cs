@@ -1,35 +1,55 @@
 ﻿using NodeManager;
 using ProcessCreationService;
 using System;
+using NodeOperator;// 
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text.RegularExpressions;
+using static ProcessCreationService.ProcessCreationService;
 
 namespace DADSTORM
 {
     class PuppetMaster
     {
         private static Dictionary<string, INodeManager> pcsServers { set; get; } = new Dictionary<string, INodeManager>();
+        private static Dictionary<string, string> adressMapping  { set; get; } = new Dictionary<string, string>();
+
 
         static void Main(string[] args)
         {
-            var v = new DataTypes.ConfigurationFileObject("test.config"); //Use this to read configuration files.
+
+            var config = new DataTypes.ConfigurationFileObject("test.config.txt"); //Use this to read configuration files.
             //var v = DataTypes.ConfigurationFileObject.ReadConfig("Test.config"); //or this
+            var pcsaddresses = config.ConfigurationNodes.SelectMany(i => i.PCSAddress).Distinct().ToList();
             
-            INodeManager pcsLocalhost = null;
+
+            INodeManager pcs = null;
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
-            pcsLocalhost = (INodeManager)Activator.GetObject(typeof(INodeManager),
-                "tcp://localhost:10000/NodeManagerService");
+            int port = 10000;
 
-            if (pcsLocalhost == null) {
-                System.Console.WriteLine("Could not locate server.");
-                return;
+            foreach (var uniqAddress in pcsaddresses) {
+                adressMapping.Add(uniqAddress,"localhost:" + port++);
+
+                pcs = (INodeManager)Activator.GetObject(typeof(INodeManager), "tcp://" + adressMapping[uniqAddress] + "/NodeManagerService");
+
+                pcsServers.Add(uniqAddress, pcs);
             }
 
-            pcsServers.Add("localhost", pcsLocalhost);
+            //var test = config.ConfigurationNodes.Where(i => i.NodeName == "OP1").ToList().First().PCSAddress.First();
+           
+       
+
+        /*    if (pcsLocalhost == null) {
+                System.Console.WriteLine("Could not locate server.");
+                return;
+            }*/
+
+            
             Console.WriteLine("PuppetMaster connected to NodeManagerService on localhost.");
             Console.WriteLine();
             Console.WriteLine("Available commands are:");
@@ -41,37 +61,49 @@ namespace DADSTORM
             Console.WriteLine();
 
             while (true) {
+                
+
                 string[] command = Console.ReadLine().Split(null);
                 string commandRes = "";
+                INodeManager currentPcs = null;
+
+
+
                 try
                 {
                     if (command[1] != "")
                     {
+                   
                         switch (command[0])
                         {
+                                                     
 
                             case "start":
-                                commandRes = pcsLocalhost.start(command[1]);
+                                foreach (var vps in opPcs[command[1]]) {
+                                    commandRes = vps.start(command[1]);
+                                }
+                                
+                                
                                 break;
 
                             case "status":
-                                commandRes = pcsLocalhost.status(command[1]);
+                                commandRes = currentPcs.status(command[1]);
                                 break;
 
                             case "interval":
-                                commandRes = pcsLocalhost.interval(command[1],Int32.Parse(command[2]));
+                                commandRes = currentPcs.interval(command[1],Int32.Parse(command[2]));
                                 break;
 
                             case "crash":
-                                commandRes = pcsLocalhost.crash(command[1]);
+                                commandRes = currentPcs.crash(command[1]);
                                 break;
 
                             case "freeze":
-                                commandRes = pcsLocalhost.freeze(command[1]);
+                                commandRes = currentPcs.freeze(command[1]);
                                 break;
 
                             case "unfreeze":
-                                commandRes = pcsLocalhost.unfreeze(command[1]);
+                                commandRes = currentPcs.unfreeze(command[1]);
                                 break;
                         }
                         Console.WriteLine(commandRes);

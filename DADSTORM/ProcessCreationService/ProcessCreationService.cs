@@ -7,29 +7,64 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Threading;
 using System.Runtime.Remoting.Messaging;
+using System.Collections;
+using System.Net.Sockets;
 
 namespace ProcessCreationService
 {
     public class ProcessCreationService
     {
+        private int _portN { set; get; }
+        public ProcessCreationService(int portN) {
+            _portN = portN;
+        }
+
+
         static void Main(string[] args)
         {
-            
-            TcpChannel channel = new TcpChannel(10000);
-            ChannelServices.RegisterChannel(channel, true);
-            RemotingConfiguration.RegisterWellKnownServiceType(
-                typeof(NodeManagerService),
-                "NodeManagerService",
-                WellKnownObjectMode.Singleton);/*Singlecall*/
-            System.Console.WriteLine("Press <enter> to terminate PCS...");
-            System.Console.ReadLine();
+            int port;
+
+            if (args.Length == 0) {
+                port = 10000;
+            }
+            else
+            {
+                port = Convert.ToInt32(args[0]);
+            }
+
+            while (true)
+            {
+
+                try
+                {
+                    TcpChannel channel = new TcpChannel(port);
+                    ChannelServices.RegisterChannel(channel, true);
+                    RemotingConfiguration.RegisterWellKnownServiceType(
+                        typeof(NodeManagerService),
+                        "nodemanagerservice",
+                            WellKnownObjectMode.Singleton);/*singlecall*/
+                    System.Console.WriteLine("press <enter> to terminate pcs...");
+                    System.Console.ReadLine();
+                    break;
+                    
+                }
+                catch (SocketException) {
+                    System.Console.WriteLine("O porto foi incrementado  ");
+                    port++;
+                }
+
+            }
         }
     }
+
+
+
 
     public class NodeManagerService : MarshalByRefObject, INodeManager
     {
         private Dictionary<string, INodeOperator> nodeOperators { get; set; } = new Dictionary<string, INodeOperator>();
         private Dictionary<string, Thread> nodeThreads { get; set; } = new Dictionary<string, Thread>();
+
         int port = 10010;//debug
 
         public delegate int RemoteAsyncDelegate(int t);
