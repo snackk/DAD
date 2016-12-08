@@ -16,7 +16,8 @@ namespace DADSTORM
     class PuppetMaster
     {
         private static Dictionary<string, INodeManager> pcsServers { set; get; } = new Dictionary<string, INodeManager>();
-        private static Dictionary<string, string> adressMapping  { set; get; } = new Dictionary<string, string>();
+        private static Dictionary<string, string> pcsAddressMapping  { set; get; } = new Dictionary<string, string>();
+        private static Dictionary<string, string> nodeAddressMapping { get; set; } = new Dictionary<string, string>();
 
 
         static void Main(string[] args)
@@ -33,23 +34,52 @@ namespace DADSTORM
             int port = 10000;
             int portNodes = 11000;
 
-            foreach (var uniqAddress in pcsaddresses) {
-                adressMapping.Add(uniqAddress,"localhost:" + port++);
+            foreach (var address in config.ConfigurationNodes.SelectMany(i => i.Addresses))
+            {
+                nodeAddressMapping.Add(address, "tcp://localhost:" + portNodes + "/op" + portNodes);
+                portNodes += 1;
+            }
 
-                pcs = (INodeManager)Activator.GetObject(typeof(INodeManager), "tcp://" + adressMapping[uniqAddress] + "/NodeManagerService");
+            foreach (var uniqAddress in pcsaddresses) {
+                pcsAddressMapping.Add(uniqAddress,"localhost:" + port++);
+
+                pcs = (INodeManager)Activator.GetObject(typeof(INodeManager), "tcp://" + pcsAddressMapping[uniqAddress] + "/NodeManagerService");
 
                 List<DADStorm.DataTypes.NodeOperatorData> ListOfNodeInformations = new List<DADStorm.DataTypes.NodeOperatorData>();
-                var referenceNodes = config.getNodesFromPCS(uniqAddress);
-                foreach (var add in referenceNodes)
+                var ConfigNodesWherePCSIsIncluded = config.getNodesFromPCS(uniqAddress);
+                foreach (var add in ConfigNodesWherePCSIsIncluded)
                 {
                     var pcsNodesForOperation = add.Addresses.Where(i => i.Contains(uniqAddress)).ToList();
                     foreach(var pcsNode in pcsNodesForOperation)
                     {
+                        List<DADStorm.DataTypes.Downstream> downstream = new List<DADStorm.DataTypes.Downstream>();
+                        List<string> siblings = new List<string>();
+                        foreach (var node in add.Addresses)
+                        {
+                            if(!node.Equals(pcsNode))
+                                siblings.Add(nodeAddressMapping[node]);
+                        }
+                        foreach (var OperatorConfig in config.getNodesRequiringOPName(add.NodeName))
+                        {
+                            var listOfDownstreamNodes = new List<string>();
+                            foreach (var downstreamnode in OperatorConfig.Addresses)
+                            {
+                                listOfDownstreamNodes.Add(nodeAddressMapping[downstreamnode]);
+                            }
+                            downstream.Add(new DADStorm.DataTypes.Downstream()
+                            {
+                                Routing = OperatorConfig.Routing,
+                                TargetIPs = listOfDownstreamNodes
+                            });
+//                            downstream.Add(nodeAddressMapping[node]);
+                        }
                         DADStorm.DataTypes.NodeOperatorData data = new DADStorm.DataTypes.NodeOperatorData()
                         {
                             ConnectionPort = portNodes++,
                             OperatorName = "op",    //TODO:Change this to come from config
-                            TypeofRouting = add.Routing
+                            TypeofRouting = add.Routing,
+                            Downstream = downstream,
+                            Siblings = siblings
                         };
                         
                         ListOfNodeInformations.Add(data);

@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigurationData.cs" />
+    <Compile Include="Downstream.cs" />
     <Compile Include="NodeOperatorData.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DADTuple.cs" />
