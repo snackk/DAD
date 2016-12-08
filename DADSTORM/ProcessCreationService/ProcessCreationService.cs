@@ -9,6 +9,7 @@ using System.Threading;
 using System.Runtime.Remoting.Messaging;
 using System.Collections;
 using System.Net.Sockets;
+using DADStorm.DataTypes;
 
 namespace ProcessCreationService
 {
@@ -65,10 +66,38 @@ namespace ProcessCreationService
     {
         private Dictionary<string, INodeOperator> nodeOperators { get; set; } = new Dictionary<string, INodeOperator>();
         private Dictionary<string, Thread> nodeThreads { get; set; } = new Dictionary<string, Thread>();
+        public bool IsStarted { get; private set; }
 
-        int port = 10010;//debug
+        int port = 10010;   //debug
 
         public delegate int RemoteAsyncDelegate(int t);
+
+        public bool init(List<NodeOperatorData> nodesInformation)
+        {
+            if (!IsStarted)
+            {
+                foreach (var node in nodesInformation)
+                {
+                    NodeOperator.NodeOperator newNode = new NodeOperator.NodeOperator(node);
+
+                    Thread t1 = new Thread(new ThreadStart(newNode.nodeCommunication));
+                    t1.Start();
+                    //t1.IsBackground = true;
+                    t1.Join();
+                    var pass = "tcp://localhost:" + node.ConnectionPort + "/" + node.OperatorName + node.ConnectionPort;
+                    nodeThreads.Add(pass, t1);    /*operatorID should be the machine IP*/
+
+                    INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator),
+                        pass);
+
+                    nodeOp.replicate(node.ConnectionPort);
+
+                    nodeOperators.Add(pass, nodeOp);  /*operatorID should be the machine IP*/
+                }
+                IsStarted = true;
+            }
+            return IsStarted;
+        }
 
         public string start(string operatorID)//DEBUG
         {
@@ -76,7 +105,7 @@ namespace ProcessCreationService
             if (nodeThreads.ContainsKey(operatorID)) {
                 return "node " + operatorID + " already exists!";
             }
-            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(operatorID, port, null);   
+            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(port, null);   
 
             Thread t1 = new Thread(new ThreadStart(node.nodeCommunication));
             t1.Start();
