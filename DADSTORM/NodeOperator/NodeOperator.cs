@@ -14,17 +14,42 @@ namespace NodeOperator
     {
         private int portN { set; get; }
         private NodeOperatorData nodeData;
-        public int digme = 0;
         private List<INodeOperator> replicas { get; set; } = new List<INodeOperator>();
 
+        private List<DADTuple> nodeTuples { get; set; } = new List<DADTuple>();
+        private int replicateDepth = 0;
 
-        public delegate int RemoteAsyncDelegate(int t);
+        public delegate bool nodeReplicationAsync(List<DADTuple> replicatedTuples);
+        public delegate void doWork();
+        public doWork nodeDoWork { get; set; } = null;
 
-        /*Node_Name -> used to create nodeCommunication*/
         public NodeOperator(int port, List<INodeOperator> ops) {
             portN = port;
             replicas = ops;
+            OperatorType ot = nodeData.TypeofOperation;
+            switch (nodeData.TypeofOperation) {
+
+                case OperatorType.count:
+                    nodeDoWork =  new doWork(countThread);
+                    break;
+                case OperatorType.custom:
+                    nodeDoWork = new doWork(customThread);
+                    break;
+                case OperatorType.dup:
+                    nodeDoWork = new doWork(dupThread);
+                    break;
+                case OperatorType.filter:
+                    nodeDoWork = new doWork(filterThread);
+                    break;
+                case OperatorType.uniq:
+                    nodeDoWork = new doWork(uniqThread);
+                    break;
             }
+        }
+
+        public void makeNodeWork() {
+            nodeDoWork.BeginInvoke(null,null);
+        }
 
         public NodeOperator(NodeOperatorData node)
         {
@@ -34,7 +59,24 @@ namespace NodeOperator
 
         public void uniqThread()
         {
-            throw new NotImplementedException();
+            bool isccurrentUnique = true;
+            List<DADTuple> Output = new List<DADTuple>();
+
+            for (int i = 0; i < nodeTuples.Count; i++)
+            {
+                isccurrentUnique = true;
+                for (int j = i + 1; j < nodeTuples.Count; j++)
+                {
+                    if (nodeTuples[i].Equals(nodeTuples[j]))
+                    {
+                        isccurrentUnique = false;
+                        break;
+                    }
+                }
+                if (isccurrentUnique)
+                    Output.Add(nodeTuples[i]);
+
+            }
         }
 
         List<DADTuple> Input = new List<DADTuple>();
@@ -43,7 +85,9 @@ namespace NodeOperator
         {
             //HACK for templating:
             var output = Input.Count;
-            throw new NotImplementedException();
+            if (nodeData.TypeofRouting == RoutingType.primary)
+                replicateTuplesToNode("");
+                
         }
 
         public void dupThread()
@@ -111,33 +155,52 @@ namespace NodeOperator
             RemotingServices.Marshal(this, nodeData.OperatorName + nodeData.ConnectionPort); // "Op" + portN);
         }
 
-        private void replicationConnection() {
-            foreach (INodeOperator no in replicas) {
-                AsyncCallback asyncCallback = new AsyncCallback(this.CallBack);
-                RemoteAsyncDelegate remoteDel = new RemoteAsyncDelegate(no.replicate);
-                IAsyncResult ar = remoteDel.BeginInvoke(10,
-                                            asyncCallback, null);
+        private void downStreamOutput(Downstream down) {
+            switch (down.Routing) {
+                case RoutingType.hashing:
+                    break;
+                case RoutingType.primary:
+                    replicateTuplesToNode(down.TargetIPs.First()).makeNodeWork();/*TODO - make it work*/
+                    break;
+                case RoutingType.random:
+                    break;
             }
+
         }
 
-        //private INodeOperator connectToNode()
-        //{
-        //    INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator),"tcp://localhost:" + inputPort + "/" + operatorForwardslash);
-        //}
-
-        public void CallBack(IAsyncResult ar)
+        private INodeOperator replicateTuplesToNode(string remoteLocation)
         {
-            int p = 0;
-            RemoteAsyncDelegate rad = (RemoteAsyncDelegate)((AsyncResult)ar).AsyncDelegate;
-            p = (int)rad.EndInvoke(ar);
-            System.Console.WriteLine("it has propagated to " + p + " nodes.");
+            INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator), remoteLocation);
+            AsyncCallback asyncCallback = new AsyncCallback(this.nodeReplicationCallBack);
+            nodeReplicationAsync remoteDel = new nodeReplicationAsync(nodeOp.replicateTuples);
+            IAsyncResult ar = remoteDel.BeginInvoke(nodeTuples,
+                                        asyncCallback, null);
+            return nodeOp;
+
         }
 
-        public int replicate(int digger)
+        private void siblingsReplication()
+        {  
+            foreach (string pass in nodeData.Siblings) {
+                replicateTuplesToNode(pass);
+            }
+
+        }
+
+        public void nodeReplicationCallBack(IAsyncResult ar)
         {
-            digme = digger;
-            Console.WriteLine(digme);
-            return digme;
+            bool p = false;
+            nodeReplicationAsync rad = (nodeReplicationAsync)((AsyncResult)ar).AsyncDelegate;
+            p = (bool)rad.EndInvoke(ar);
+
+               
+        }
+
+        public bool replicateTuples(List<DADTuple> replicatedTuples) {
+            nodeTuples.AddRange(replicatedTuples);
+            replicateDepth++;
+            /*if(replicateDepth == LISTA_NEVES.length)*/
+            return true;
         }
     }
 }

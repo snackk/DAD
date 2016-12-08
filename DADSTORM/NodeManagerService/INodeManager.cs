@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using DADStorm.DataTypes;
+using System.Collections.Generic;
 
 namespace NodeManager
 {
     public interface INodeManager
     {
-        string start(string operatorID);//, string operation, int operatorPort);
+
 
         string interval(string operatorID, int x_ms);
 
