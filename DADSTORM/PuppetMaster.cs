@@ -77,8 +77,10 @@ namespace DADSTORM
                             ConnectionPort = portNodes++,
                             OperatorName = "op",    //TODO:Change this to come from config
                             TypeofRouting = ConfigNode.Routing,
+                            Siblings = siblings,
                             Downstream = downstream,
-                            Siblings = siblings
+                            TypeofOperation = ConfigNode.Operation,
+                            OperationArgs = ConfigNode.OperationArgs
                         };
                         
                         ListOfNodeInformations.Add(data);   //New node that will be created by the PCS
