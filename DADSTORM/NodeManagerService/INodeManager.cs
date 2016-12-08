@@ -1,4 +1,6 @@
-﻿namespace NodeManager
+﻿using System.Collections.Generic;
+
+namespace NodeManager
 {
     public interface INodeManager
     {
@@ -13,5 +15,7 @@
         string freeze(string operatorID);
 
         string unfreeze(string operatorID);
+
+        bool init(List<DADStorm.DataTypes.NodeOperatorData> node);
     }
 }

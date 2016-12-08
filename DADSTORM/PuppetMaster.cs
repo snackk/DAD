@@ -22,7 +22,7 @@ namespace DADSTORM
         static void Main(string[] args)
         {
 
-            var config = new DataTypes.ConfigurationFileObject("test.config.txt"); //Use this to read configuration files.
+            var config = new DataTypes.ConfigurationFileObject("test.config"); //Use this to read configuration files.
             //var v = DataTypes.ConfigurationFileObject.ReadConfig("Test.config"); //or this
             var pcsaddresses = config.ConfigurationNodes.SelectMany(i => i.PCSAddress).Distinct().ToList();
             
@@ -31,12 +31,35 @@ namespace DADSTORM
             TcpChannel channel = new TcpChannel();
             ChannelServices.RegisterChannel(channel, true);
             int port = 10000;
+            int portNodes = 11000;
 
             foreach (var uniqAddress in pcsaddresses) {
                 adressMapping.Add(uniqAddress,"localhost:" + port++);
 
                 pcs = (INodeManager)Activator.GetObject(typeof(INodeManager), "tcp://" + adressMapping[uniqAddress] + "/NodeManagerService");
 
+                List<DADStorm.DataTypes.NodeOperatorData> ListOfNodeInformations = new List<DADStorm.DataTypes.NodeOperatorData>();
+                var referenceNodes = config.getNodesFromPCS(uniqAddress);
+                foreach (var add in referenceNodes)
+                {
+                    var pcsNodesForOperation = add.Addresses.Where(i => i.Contains(uniqAddress)).ToList();
+                    foreach(var pcsNode in pcsNodesForOperation)
+                    {
+                        DADStorm.DataTypes.NodeOperatorData data = new DADStorm.DataTypes.NodeOperatorData()
+                        {
+                            ConnectionPort = portNodes++,
+                            OperatorName = "op",    //TODO:Change this to come from config
+                            TypeofRouting = add.Routing
+                        };
+                        
+                        ListOfNodeInformations.Add(data);
+                    }
+                }
+                //DADStorm.DataTypes.NodeOperatorData nop = new DADStorm.DataTypes.NodeOperatorData()
+                //{
+                //}
+
+                var bo = pcs.init(ListOfNodeInformations);
                 pcsServers.Add(uniqAddress, pcs);
             }
 
@@ -79,9 +102,9 @@ namespace DADSTORM
                                                      
 
                             case "start":
-                                foreach (var vps in opPcs[command[1]]) {
-                                    commandRes = vps.start(command[1]);
-                                }
+                                //foreach (var vps in opPcs[command[1]]) {
+                                //    commandRes = vps.start(command[1]);
+                                //}
                                 
                                 
                                 break;

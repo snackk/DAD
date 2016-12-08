@@ -12,8 +12,8 @@ namespace NodeOperator
 {
     public class NodeOperator : MarshalByRefObject, INodeOperator
     {
-        private string nodeName { set; get; }
         private int portN { set; get; }
+        private NodeOperatorData nodeData;
         public int digme = 0;
         private List<INodeOperator> replicas { get; set; } = new List<INodeOperator>();
 
@@ -21,11 +21,16 @@ namespace NodeOperator
         public delegate int RemoteAsyncDelegate(int t);
 
         /*Node_Name -> used to create nodeCommunication*/
-        public NodeOperator(string operator_id, int port, List<INodeOperator> ops) {
-            nodeName = operator_id;
+        public NodeOperator(int port, List<INodeOperator> ops) {
             portN = port;
             replicas = ops;
             }
+
+        public NodeOperator(NodeOperatorData node)
+        {
+            portN = node.ConnectionPort;
+            nodeData = node;
+        }
 
         public void uniqThread()
         {
@@ -33,6 +38,7 @@ namespace NodeOperator
         }
 
         List<DADTuple> Input = new List<DADTuple>();
+
         public void countThread()
         {
             //HACK for templating:
@@ -94,7 +100,7 @@ namespace NodeOperator
         public void debug() {
             while (true) { }
         }
-
+        
         public void nodeCommunication()
         {
             IDictionary prop = new Hashtable();
@@ -102,7 +108,7 @@ namespace NodeOperator
             prop["port"] = portN;
             TcpChannel channel = new TcpChannel(prop, null, null);
             ChannelServices.RegisterChannel(channel, true);
-            RemotingServices.Marshal(this, "Op" + portN);
+            RemotingServices.Marshal(this, nodeData.OperatorName + nodeData.ConnectionPort); // "Op" + portN);
         }
 
         private void replicationConnection() {
@@ -113,6 +119,11 @@ namespace NodeOperator
                                             asyncCallback, null);
             }
         }
+
+        //private INodeOperator connectToNode()
+        //{
+        //    INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator),"tcp://localhost:" + inputPort + "/" + operatorForwardslash);
+        //}
 
         public void CallBack(IAsyncResult ar)
         {
@@ -125,6 +136,7 @@ namespace NodeOperator
         public int replicate(int digger)
         {
             digme = digger;
+            Console.WriteLine(digme);
             return digme;
         }
     }

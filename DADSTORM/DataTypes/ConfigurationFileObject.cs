@@ -31,6 +31,11 @@ namespace DADSTORM.DataTypes
             return ConfigurationNodes.Where(i => i.NodeName.Equals(op)).SelectMany(i => i.PCSAddress).ToList();
         }
 
+        public List<ConfigurationData> getNodesFromPCS(string pcsAddress)
+        {
+            return ConfigurationNodes.Where(i => i.PCSAddress.Contains(pcsAddress)).ToList();
+        }
+
         /// <summary>
         /// Reads a configuration file and creates an object that represents it and it's parameters.
         /// </summary>

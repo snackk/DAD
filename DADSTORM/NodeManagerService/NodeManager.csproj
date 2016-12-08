@@ -46,6 +46,12 @@
     <Compile Include="INodeManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DADSTORM.DataTypes\DADStorm.DataTypes.csproj">
+      <Project>{b4e5a466-e039-426c-a9de-048f221df6cc}</Project>
+      <Name>DADStorm.DataTypes</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
