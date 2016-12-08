@@ -40,26 +40,26 @@ namespace DADSTORM
                 portNodes += 1;
             }
 
-            foreach (var uniqAddress in pcsaddresses) {
-                pcsAddressMapping.Add(uniqAddress,"localhost:" + port++);
+            foreach (var uniqAddress in pcsaddresses) {     //Iteration over all the PCSs
+                pcsAddressMapping.Add(uniqAddress,"localhost:" + port++);   //Create a mapping for the real (localhost) address
 
                 pcs = (INodeManager)Activator.GetObject(typeof(INodeManager), "tcp://" + pcsAddressMapping[uniqAddress] + "/NodeManagerService");
 
                 List<DADStorm.DataTypes.NodeOperatorData> ListOfNodeInformations = new List<DADStorm.DataTypes.NodeOperatorData>();
                 var ConfigNodesWherePCSIsIncluded = config.getNodesFromPCS(uniqAddress);
-                foreach (var add in ConfigNodesWherePCSIsIncluded)
+                foreach (var ConfigNode in ConfigNodesWherePCSIsIncluded)  //Iteration over all the configuration nodes for that PCS
                 {
-                    var pcsNodesForOperation = add.Addresses.Where(i => i.Contains(uniqAddress)).ToList();
-                    foreach(var pcsNode in pcsNodesForOperation)
+                    var NodeAddresses = ConfigNode.Addresses.Where(i => i.Contains(uniqAddress)).ToList();  //Fake (remote) Addresses of the node
+                    foreach(var NodeAddress in NodeAddresses)
                     {
                         List<DADStorm.DataTypes.Downstream> downstream = new List<DADStorm.DataTypes.Downstream>();
                         List<string> siblings = new List<string>();
-                        foreach (var node in add.Addresses)
+                        foreach (var node in ConfigNode.Addresses) //Creation of a list of siblings
                         {
-                            if(!node.Equals(pcsNode))
+                            if(!node.Equals(NodeAddress))
                                 siblings.Add(nodeAddressMapping[node]);
                         }
-                        foreach (var OperatorConfig in config.getNodesRequiringOPName(add.NodeName))
+                        foreach (var OperatorConfig in config.getNodesRequiringOPName(ConfigNode.NodeName))    //Configuration nodes that require our operation (downstreams)
                         {
                             var listOfDownstreamNodes = new List<string>();
                             foreach (var downstreamnode in OperatorConfig.Addresses)
@@ -71,18 +71,17 @@ namespace DADSTORM
                                 Routing = OperatorConfig.Routing,
                                 TargetIPs = listOfDownstreamNodes
                             });
-//                            downstream.Add(nodeAddressMapping[node]);
                         }
                         DADStorm.DataTypes.NodeOperatorData data = new DADStorm.DataTypes.NodeOperatorData()
                         {
                             ConnectionPort = portNodes++,
                             OperatorName = "op",    //TODO:Change this to come from config
-                            TypeofRouting = add.Routing,
+                            TypeofRouting = ConfigNode.Routing,
                             Downstream = downstream,
                             Siblings = siblings
                         };
                         
-                        ListOfNodeInformations.Add(data);
+                        ListOfNodeInformations.Add(data);   //New node that will be created by the PCS
                     }
                 }
                 //DADStorm.DataTypes.NodeOperatorData nop = new DADStorm.DataTypes.NodeOperatorData()

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace DADStorm.DataTypes
 {
+    [Serializable]
     public class DADTuple
     {
         private const string SplitWordRegexString = @"[^\p{L}0-9\=]*[\p{Z}\(\)\,\""][^\p{L}0-9\=]*";
