@@ -24,6 +24,7 @@ namespace DADSTORM
 
             var config = new DataTypes.ConfigurationFileObject("test.config.txt"); //Use this to read configuration files.
             //var v = DataTypes.ConfigurationFileObject.ReadConfig("Test.config"); //or this
+
             var pcsaddresses = config.ConfigurationNodes.SelectMany(i => i.PCSAddress).Distinct().ToList();
             
 
@@ -36,9 +37,12 @@ namespace DADSTORM
                 adressMapping.Add(uniqAddress,"localhost:" + port++);
 
                 pcs = (INodeManager)Activator.GetObject(typeof(INodeManager), "tcp://" + adressMapping[uniqAddress] + "/NodeManagerService");
+                
 
                 pcsServers.Add(uniqAddress, pcs);
             }
+           
+            foreach(var v in    ){} //TODO precisa de correr todos os nodes um "configurationnode" 
 
             //var test = config.ConfigurationNodes.Where(i => i.NodeName == "OP1").ToList().First().PCSAddress.First();
            
@@ -65,7 +69,7 @@ namespace DADSTORM
 
                 string[] command = Console.ReadLine().Split(null);
                 string commandRes = "";
-                INodeManager currentPcs = null;
+               
 
 
 
@@ -73,17 +77,16 @@ namespace DADSTORM
                 {
                     if (command[1] != "")
                     {
-                   
+                        var vpsName = config.getAddressesFromOPName(command[1]).First();
+                        var currentPcs = pcsServers[vpsName];
+                            
                         switch (command[0])
                         {
-                                                     
+                                                  
 
                             case "start":
-                                foreach (var vps in opPcs[command[1]]) {
-                                    commandRes = vps.start(command[1]);
-                                }
-                                
-                                
+
+                                commandRes = currentPcs.start(command[1]);
                                 break;
 
                             case "status":

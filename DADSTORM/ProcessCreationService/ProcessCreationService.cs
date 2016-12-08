@@ -42,8 +42,9 @@ namespace ProcessCreationService
                     RemotingConfiguration.RegisterWellKnownServiceType(
                         typeof(NodeManagerService),
                         "nodemanagerservice",
-                            WellKnownObjectMode.Singleton);/*singlecall*/
+                            WellKnownObjectMode.Singleton);
                     System.Console.WriteLine("press <enter> to terminate pcs...");
+                    System.Console.WriteLine("Port : " + port );
                     System.Console.ReadLine();
                     break;
                     
