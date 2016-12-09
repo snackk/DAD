@@ -78,6 +78,7 @@ namespace ProcessCreationService
             {
                 foreach (var node in nodesInformation)
                 {
+          
                     NodeOperator.NodeOperator newNode = new NodeOperator.NodeOperator(node);
 
                     Thread t1 = new Thread(new ThreadStart(newNode.nodeCommunication));
@@ -87,71 +88,13 @@ namespace ProcessCreationService
                     var pass = "tcp://localhost:" + node.ConnectionPort + "/" + node.OperatorName + node.ConnectionPort;
                     nodeThreads.Add(pass, t1);    /*operatorID should be the machine IP*/
 
-                    INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator),
-                        pass);
-
-                    nodeOp.replicate(node.ConnectionPort);
+                    INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator), pass);
 
                     nodeOperators.Add(pass, nodeOp);  /*operatorID should be the machine IP*/
                 }
                 IsStarted = true;
             }
             return IsStarted;
-        }
-
-        public string start(string operatorID)//DEBUG
-        {
-            port++;
-            if (nodeThreads.ContainsKey(operatorID)) {
-                return "node " + operatorID + " already exists!";
-            }
-            NodeOperator.NodeOperator node = new NodeOperator.NodeOperator(port, null);   
-
-            Thread t1 = new Thread(new ThreadStart(node.nodeCommunication));
-            t1.Start();
-            //t1.IsBackground = true;
-            t1.Join();
-            nodeThreads.Add(operatorID, t1);    /*operatorID should be the machine IP*/
-
-            INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator),
-                "tcp://localhost:" + port + "/Op"+port);
-
-            nodeOperators.Add(operatorID, nodeOp);  /*operatorID should be the machine IP*/
-
-            AsyncCallback asyncCallback = new AsyncCallback(this.CallBack);
-            RemoteAsyncDelegate remoteDel = new RemoteAsyncDelegate(nodeOp.replicate);
-            IAsyncResult ar = remoteDel.BeginInvoke(port,
-                                        asyncCallback, null);
-
-            return "node " + operatorID + " is up and running.";
-
-            /*
-            switch (operation)
-            {
-                case "UNIQ":
-                    t1 = new Thread(new ThreadStart(node.uniqThread));
-                    break;
-                case "COUNT":
-                    t1 = new Thread(new ThreadStart(node.countThread));
-                    break;
-                case "DUP":
-                    t1 = new Thread(new ThreadStart(node.dupThread));
-                    break;
-                case "FILTER":
-                    t1 = new Thread(new ThreadStart(node.filterThread));
-                    break;
-                case "CUSTOM":
-                    t1 = new Thread(new ThreadStart(node.customThread));
-                    break;
-            }*/
-        }
-
-        public void CallBack(IAsyncResult ar)
-        {
-            int p = 0;
-            RemoteAsyncDelegate rad = (RemoteAsyncDelegate)((AsyncResult)ar).AsyncDelegate;
-            p = (int)rad.EndInvoke(ar);
-            System.Console.WriteLine("it has returned " + p + " !");
         }
 
         public string crash(string operatorID)
