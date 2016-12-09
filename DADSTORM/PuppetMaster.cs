@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using DADStorm.DataTypes;
 using static ProcessCreationService.ProcessCreationService;
 using System.IO;
+using LoggingService;
 
 namespace DADSTORM
 {
@@ -21,6 +22,7 @@ namespace DADSTORM
         private static Dictionary<string, string> pcsAddressMapping  { set; get; } = new Dictionary<string, string>();
         private static Dictionary<string, string> nodeAddressMapping { get; set; } = new Dictionary<string, string>();
 
+        private static int Interval { get; set; } = 0;
 
         static void Main(string[] args)
         {
@@ -31,7 +33,7 @@ namespace DADSTORM
             
 
             INodeManager pcs = null;
-            TcpChannel channel = new TcpChannel();
+            TcpChannel channel = new TcpChannel(9999);
             ChannelServices.RegisterChannel(channel, true);
             int port = 10000;
             int portNodes = 11000;
@@ -105,7 +107,9 @@ namespace DADSTORM
                             Downstream = downstream,
                             TypeofOperation = ConfigNode.Operation,
                             OperationArgs = Opargs,
-                            Initialtuples = initialTuples
+                            Initialtuples = initialTuples,
+                            NodeAddress = NodeAddress,
+                            LogTuples = (config.Logging == DataTypes.LoggingLevel.full)
                         };
                         
                         ListOfNodeInformations.Add(data);   //New node that will be created by the PCS
@@ -119,91 +123,125 @@ namespace DADSTORM
                 pcsServers.Add(uniqAddress, pcs);
             }
 
+            //TcpChannel channelLog = new TcpChannel(9999);
+            //ChannelServices.RegisterChannel(channelLog, true);
+            System.Runtime.Remoting.RemotingConfiguration.RegisterWellKnownServiceType(
+                typeof(Logger),
+                "logger",
+                    System.Runtime.Remoting.WellKnownObjectMode.Singleton);
+            System.Console.WriteLine("Logging Service open on port: " + port);
+
+            ILogger Logger = (ILogger)Activator.GetObject(typeof(INodeOperator), "tcp://localhost:9999/logger");
             //var test = config.ConfigurationNodes.Where(i => i.NodeName == "OP1").ToList().First().PCSAddress.First();
-           
-       
-
-        /*    if (pcsLocalhost == null) {
-                System.Console.WriteLine("Could not locate server.");
-                return;
-            }*/
-
-            
-            Console.WriteLine("PuppetMaster connected to NodeManagerService on localhost.");
-            Console.WriteLine();
-            Console.WriteLine("Available commands are:");
-            Console.WriteLine("     start [OP_ID]");
-            Console.WriteLine("     status [OP_ID]");
-            Console.WriteLine("     crash [OP_ID]");
-            Console.WriteLine("     freeze [OP_ID]");
-            Console.WriteLine("     unfreeze [OP_ID]");
-            Console.WriteLine();
-
-            while (true) {
-                
-
-                string[] command = Console.ReadLine().Split(null);
-                string commandRes = "";
-                INodeManager currentPcs = null;
 
 
+
+            /*    if (pcsLocalhost == null) {
+                    System.Console.WriteLine("Could not locate server.");
+                    return;
+                }*/
+
+            foreach(var line in config.Script)
+            {
+                Logger.log(line.ToString());
+                string[] command = line.ToString().Split(null);
 
                 try
                 {
-                    List<string> psCandidate = null;
-                    List<string> nodeCandidate = null;
-                    switch (command[0])
-                    {
-                        case "start":
-                            psCandidate = config.getAddressesFromOPName(command[1]);
-                            var res = psCandidate.First();
-                            pcsServers[res].start(command[1]);
-                            //foreach (var p in ps)
-                            //{
-                            //    pcsServers[p].start(command[1]);
-                            //}
-
-                            break;
-
-                        case "status":
-                            foreach (var pcss in pcsServers.Select(i => i.Value))
-                            {
-                                pcss.status();
-                            }
-                            break;
-
-                        case "interval":
-                            commandRes = currentPcs.interval(command[1], Int32.Parse(command[2]));
-                            break;
-
-                        case "crash":
-                            psCandidate = config.getAddressesFromOPName(command[1]);
-                            nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
-                            var toCrash = psCandidate[Convert.ToInt32(command[2])];
-                            pcsServers[toCrash].crash(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
-                            break;
-
-                        case "freeze":
-                            psCandidate = config.getAddressesFromOPName(command[1]);
-                            nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
-                            var toFreeze = psCandidate[Convert.ToInt32(command[2])];
-                            pcsServers[toFreeze].freeze(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
-                            break;
-
-                        case "unfreeze":
-                            psCandidate = config.getAddressesFromOPName(command[1]);
-                            nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
-                            var toThaw = psCandidate[Convert.ToInt32(command[2])];
-                            pcsServers[toThaw].freeze(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
-                            break;
-                    }
-                    Console.WriteLine(commandRes);
+                    handleInput(config, command);
                 }
                 catch (IndexOutOfRangeException)
                 {
-
+                    Console.WriteLine("Invalid Arguments");
                 }
             }
+
+            Console.WriteLine();
+            Console.WriteLine("Available commands are:");
+            Console.WriteLine("     start OP_ID");
+            Console.WriteLine("     status");
+            Console.WriteLine("     interval time");
+            Console.WriteLine("     crash OP_ID Rep_ID");
+            Console.WriteLine("     freeze OP_ID Rep_ID");
+            Console.WriteLine("     unfreeze OP_ID Rep_ID");
+            Console.WriteLine();
+
+            while (true) {
+
+                string commandLine = Console.ReadLine();
+                Logger.log(commandLine);
+                string[] command = commandLine.Split(null);
+
+                try
+                {
+                    handleInput(config, command);
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    Console.WriteLine("Invalid Arguments");
+                }
+            }
+        }
+
+        private static void handleInput(DataTypes.ConfigurationFileObject config, string[] command)
+        {
+            List<string> psCandidate = null;
+            List<string> nodeCandidate = null;
+            switch (command[0].ToLower())
+            {
+                case "start":
+                    if (config.ConfigurationNodes.Where(i => i.NodeName.Equals(command[1])).Select(i => i.TargetData).First().Contains("."))
+                    {   //HACK: So that start other nodes does not do anything
+                        psCandidate = config.getAddressesFromOPName(command[1]);
+                        var res = psCandidate.First();
+                        pcsServers[res].start(command[1]);
+                    }
+                    //foreach (var p in ps)
+                    //{
+                    //    pcsServers[p].start(command[1]);
+                    //}
+
+                    break;
+
+                case "status":
+                    foreach (var pcss in pcsServers.Select(i => i.Value))
+                    {
+                        pcss.status();
+                    }
+                    break;
+
+                case "interval":
+                    Interval = Convert.ToInt32(command[2]);
+                    break;
+
+                case "crash":
+                    psCandidate = config.getAddressesFromOPName(command[1]);
+                    nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
+                    var toCrash = psCandidate[Convert.ToInt32(command[2])];
+                    pcsServers[toCrash].crash(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
+                    break;
+
+                case "freeze":
+                    psCandidate = config.getAddressesFromOPName(command[1]);
+                    nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
+                    var toFreeze = psCandidate[Convert.ToInt32(command[2])];
+                    pcsServers[toFreeze].freeze(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
+                    break;
+
+                case "unfreeze":
+                    psCandidate = config.getAddressesFromOPName(command[1]);
+                    nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
+                    var toThaw = psCandidate[Convert.ToInt32(command[2])];
+                    pcsServers[toThaw].unfreeze(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
+                    break;
+                case "wait":
+                    Thread.Sleep(Convert.ToInt32(command[1]));
+                    break;
+                default:
+                    Console.WriteLine("Invalid command");
+                    break;
+            }
+            Thread.Sleep(Interval);
         }
     }
 }

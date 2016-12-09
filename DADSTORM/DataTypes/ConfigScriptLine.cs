@@ -37,6 +37,7 @@ namespace DADSTORM.DataTypes
     {
         private string nodeID;
         private string rep_ID;
+        private string unparsedLine;
         private int opValue;
         public ScriptCommand Operation { get; set; }
         public string NodeName
@@ -87,11 +88,17 @@ namespace DADSTORM.DataTypes
 
         public override string ToString()
         {
-            return "Command: " + Operation.ToDescriptionString();
+            return unparsedLine;
         }
 
         public ConfigScriptLine(List<string> words)
         {
+            bool first = true;
+            foreach (string word in words)
+            {
+                unparsedLine += (first ? "" : " ") + word;
+                first = false;
+            }
             switch (words[0].ToUpperInvariant())
             {
                 case "INTERVAL":

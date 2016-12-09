@@ -74,7 +74,13 @@ namespace DADStorm.DataTypes
 
         public override string ToString()
         {
-            return "Tuple count: " + Count + " | Item 1: " + Item1;
+            int i = 0;
+            string output = "";
+            foreach (var item in Items)
+            {
+                output += item + (Items.Count == ++i ? "" : ", ");
+            }
+            return output;
         }
 
         public override bool Equals(object obj)

@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B73EF61D-57B3-4271-8966-58B65A4D0D1D}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{70C6187C-2FA5-4A84-ADC9-AD30F8BC6A2C}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DADSTORM</RootNamespace>
-    <AssemblyName>DADSTORM</AssemblyName>
+    <RootNamespace>LoggingService</RootNamespace>
+    <AssemblyName>LoggingService</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -35,7 +32,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,38 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataTypes\ConfigScriptLine.cs" />
-    <Compile Include="DataTypes\ConfigurationFileObject.cs" />
-    <Compile Include="DataTypes\Logging.cs" />
-    <Compile Include="DataTypes\Semantics.cs" />
-    <Compile Include="Logger.cs" />
-    <Compile Include="PuppetMaster.cs" />
+    <Compile Include="ILogger.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="DADSTORM.DataTypes\DADStorm.DataTypes.csproj">
-      <Project>{b4e5a466-e039-426c-a9de-048f221df6cc}</Project>
-      <Name>DADStorm.DataTypes</Name>
-    </ProjectReference>
-    <ProjectReference Include="LoggingService\LoggingService.csproj">
-      <Project>{70c6187c-2fa5-4a84-adc9-ad30f8bc6a2c}</Project>
-      <Name>LoggingService</Name>
-    </ProjectReference>
-    <ProjectReference Include="NodeManagerService\NodeManager.csproj">
-      <Project>{40D6BDC6-5669-47FB-BEF7-27006810410B}</Project>
-      <Name>NodeManager</Name>
-    </ProjectReference>
-    <ProjectReference Include="NodeOperator\NodeOperator.csproj">
-      <Project>{b22073b2-59ed-427d-b92a-aec742b204d7}</Project>
-      <Name>NodeOperator</Name>
-    </ProjectReference>
-    <ProjectReference Include="ProcessCreationService\ProcessCreationService.csproj">
-      <Project>{5e2dbe75-2bba-4477-bae3-4d130932e304}</Project>
-      <Name>ProcessCreationService</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

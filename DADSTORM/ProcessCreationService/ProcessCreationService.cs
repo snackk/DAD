@@ -45,14 +45,13 @@ namespace ProcessCreationService
                         typeof(NodeManagerService),
                         "nodemanagerservice",
                             WellKnownObjectMode.Singleton);
+                    System.Console.WriteLine("Service open on port: " + port);
                     System.Console.WriteLine("press <enter> to terminate pcs...");
-                    System.Console.WriteLine("Port : " + port );
                     System.Console.ReadLine();
                     break;
                     
                 }
                 catch (SocketException) {
-                    System.Console.WriteLine("O porto foi incrementado  ");
                     port++;
                 }
 
@@ -194,12 +193,8 @@ namespace ProcessCreationService
         {
             try
             {
-                if (nodeThreads[operatorID].IsAlive)
-                {
-                    nodeThreads[operatorID].Resume();
-                    return "node " + operatorID + " is resuming.";
-                }
-                return "node " + operatorID + " is not frozen.";
+                nodeOperators[operatorID].unfreeze();
+                return "node " + operatorID + " is unfrozen.";
             }
             catch (KeyNotFoundException)
             {

@@ -59,6 +59,10 @@
       <Project>{b4e5a466-e039-426c-a9de-048f221df6cc}</Project>
       <Name>DADStorm.DataTypes</Name>
     </ProjectReference>
+    <ProjectReference Include="..\LoggingService\LoggingService.csproj">
+      <Project>{70C6187C-2FA5-4A84-ADC9-AD30F8BC6A2C}</Project>
+      <Name>LoggingService</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NodeManagerService\NodeManager.csproj">
       <Project>{40d6bdc6-5669-47fb-bef7-27006810410b}</Project>
       <Name>NodeManager</Name>

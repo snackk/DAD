@@ -19,10 +19,7 @@ namespace DADStorm.DataTypes
         public List<string> OperationArgs { get; set; }
         public string OperatorID { get; set; }
         public List<DADTuple> Initialtuples { get; set; }
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            throw new NotImplementedException();
-        }
+        public string NodeAddress { get; set; }
+        public bool LogTuples { get; set; }
     }
 }

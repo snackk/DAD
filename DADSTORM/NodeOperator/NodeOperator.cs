@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Reflection;
 using System.Threading;
+using LoggingService;
 
 namespace NodeOperator
 {
@@ -17,7 +18,8 @@ namespace NodeOperator
     {
         private int portN { set; get; }
         private NodeOperatorData nodeData;
-        
+
+        private bool LogTuples { get; set; }
         private List<DADTuple> OutputTuples = new List<DADTuple>();
         private List<DADTuple> InputTuples { get; set; } = new List<DADTuple>();
 
@@ -65,6 +67,7 @@ namespace NodeOperator
             portN = node.ConnectionPort;
             nodeData = node;
             InputTuples = node.Initialtuples;
+            LogTuples = node.LogTuples;
 
             OperatorType ot = nodeData.TypeofOperation;
             switch (nodeData.TypeofOperation) {
@@ -93,7 +96,7 @@ namespace NodeOperator
 
         public void replicationAndDownstreaming() {
 
-            if (nodeData.TypeofRouting == RoutingType.primary || nodeData.TypeofRouting == RoutingType.random)
+            if (true)//nodeData.TypeofRouting == RoutingType.primary || nodeData.TypeofRouting == RoutingType.random)
             {
                 foreach (Downstream dw in nodeData.Downstream)
                 {
@@ -308,8 +311,20 @@ namespace NodeOperator
 
         }
 
+        private void logTuples()
+        {
+            if (LogTuples)
+            {
+                ILogger nodeOp = (ILogger)Activator.GetObject(typeof(INodeOperator), "tcp://localhost:9999/logger");
+                List<string> input = new List<string>();
+                OutputTuples.ForEach(i => input.Add("tuple " + nodeData.NodeAddress + ", " + i.ToString()));
+                nodeOp.logAsync(input.ToArray());
+            }
+        }
+
         private void siblingsReplication()
-        {  
+        {
+            logTuples();
             foreach (string pass in nodeData.Siblings) {
                 replicateTuplesToNode(pass);
             }
@@ -332,18 +347,15 @@ namespace NodeOperator
 
         public string status()
         {
-            string output = "Thread is ";
             if (IsStopped)
             {
-                output += "stopped.";
-                return output;
+                return "stopped";
             }
             if (IsFrozen)
             {
-                output += "frozen";
-                return output;
+                return "frozen";
             }
-            return output + "running";
+            return "running";
         }
     }
 }
