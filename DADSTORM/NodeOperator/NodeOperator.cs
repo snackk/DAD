@@ -7,6 +7,8 @@ using System.Runtime.Remoting.Channels.Tcp;
 using System.Runtime.Remoting.Messaging;
 using DADStorm.DataTypes;
 using System.Linq;
+using System.Text;
+using System.Reflection;
 
 namespace NodeOperator
 {
@@ -156,10 +158,47 @@ namespace NodeOperator
 
         public void customThread()
         {
+            byte[] code = Encoding.ASCII.GetBytes(nodeData.OperationArgs[0]);
+            string className = nodeData.OperationArgs[1];
 
+            Assembly assembly = Assembly.Load(code);
+            // Walk through each type in the assembly looking for our class
+            foreach (Type type in assembly.GetTypes())
+            {
+                if (type.IsClass == true)
+                {
+                    if (type.FullName.EndsWith("." + className))
+                    {
+                        // create an instance of the object
+                        object ClassObj = Activator.CreateInstance(type);
 
-            
+                        // Dynamically Invoke the method
+                        
+                        object[] args = new object[] { InputTuples };
+                        object resultObject = type.InvokeMember("CustomOperation",
+                          BindingFlags.Default | BindingFlags.InvokeMethod,
+                               null,
+                               ClassObj,
+                               args);
+                        IList<IList<string>> result = (IList<IList<string>>)resultObject;
+                        Console.WriteLine("Map call result was: ");
+                        foreach (IList<string> tuple in result)
+                        {
+                            Console.Write("tuple: ");
+                            foreach (string s in tuple)
+                                Console.Write(s + " ,");
+                            Console.WriteLine();
+                        }
+                        return;
+                    }
+                }
+            }
+            throw (new System.Exception("could not invoke method"));
         }
+
+    
+
+
 
         public void debug() {
             while (true) { }
