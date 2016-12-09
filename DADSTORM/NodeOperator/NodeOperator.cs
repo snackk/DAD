@@ -16,7 +16,6 @@ namespace NodeOperator
     {
         private int portN { set; get; }
         private NodeOperatorData nodeData;
-        private List<INodeOperator> replicas { get; set; } = new List<INodeOperator>();
 
         private List<DADTuple> InputTuples = new List<DADTuple>();
         private List<DADTuple> OutputTuples = new List<DADTuple>();
@@ -28,9 +27,10 @@ namespace NodeOperator
         public delegate void doWork();
         public doWork nodeDoWork { get; set; } = null;
 
-        public NodeOperator(int port, List<INodeOperator> ops) {
-            portN = port;
-            replicas = ops;
+        public NodeOperator(NodeOperatorData node) {
+            portN = node.ConnectionPort;
+            nodeData = node;
+
             OperatorType ot = nodeData.TypeofOperation;
             switch (nodeData.TypeofOperation) {
 
@@ -53,13 +53,7 @@ namespace NodeOperator
         }
 
         public void makeNodeWork() {
-            //nodeDoWork.BeginInvoke(null,null);
-        }
-
-        public NodeOperator(NodeOperatorData node)
-        {
-            portN = node.ConnectionPort;
-            nodeData = node;
+            nodeDoWork.BeginInvoke(null,null);
         }
 
         public void replicationAndDownstreaming() {

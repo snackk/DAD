@@ -70,6 +70,8 @@ namespace ProcessCreationService
         private Dictionary<string, List<string>> OPtoNodes { get; set; } = new Dictionary<string, List<string>>();
         public bool IsStarted { get; private set; }
 
+        public delegate void testAsync();
+
         int port = 10010;   //debug
 
         public delegate int RemoteAsyncDelegate(int t);
@@ -106,12 +108,12 @@ namespace ProcessCreationService
         {
             foreach(var node in OPtoNodes[v])
             {
-                //INodeOperator nodeOp = nodeOperators[node];
+                INodeOperator nodeOp = nodeOperators[node];
                 //nodeOp.makeNodeWork();
-                //AsyncCallback asyncCallback = new AsyncCallback(testCallBack);
-                //nodeReplicationAsync remoteDel = new nodeReplicationAsync(nodeOp.makeNodeWork);
-                //IAsyncResult ar = remoteDel.BeginInvoke(null,
-                //                            asyncCallback, null);
+                AsyncCallback asyncCallback = new AsyncCallback(testCallBack);
+                testAsync remoteDel = new testAsync(nodeOp.makeNodeWork);
+                IAsyncResult ar = remoteDel.BeginInvoke(null,
+                                            asyncCallback);
 
             }
         }
