@@ -17,6 +17,7 @@ namespace DADStorm.DataTypes
         public RoutingType TypeofRouting { get; set; }
         public List<string> Siblings { get; set; }
         public List<string> OperationArgs { get; set; }
+        public string OperatorID { get; set; }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {

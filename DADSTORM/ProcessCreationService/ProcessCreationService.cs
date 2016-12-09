@@ -9,6 +9,7 @@ using System.Threading;
 using System.Runtime.Remoting.Messaging;
 using System.Collections;
 using System.Net.Sockets;
+using System.Linq;
 using DADStorm.DataTypes;
 
 namespace ProcessCreationService
@@ -66,6 +67,7 @@ namespace ProcessCreationService
     {
         private Dictionary<string, INodeOperator> nodeOperators { get; set; } = new Dictionary<string, INodeOperator>();
         private Dictionary<string, Thread> nodeThreads { get; set; } = new Dictionary<string, Thread>();
+        private Dictionary<string, List<string>> OPtoNodes { get; set; } = new Dictionary<string, List<string>>();
         public bool IsStarted { get; private set; }
 
         int port = 10010;   //debug
@@ -76,9 +78,12 @@ namespace ProcessCreationService
         {
             if (!IsStarted)
             {
+                foreach (var OpID in nodesInformation.GroupBy(group=>group.OperatorID).Select(group => group.First()))
+                {
+                    OPtoNodes.Add(OpID.OperatorID, new List<string>());
+                }
                 foreach (var node in nodesInformation)
                 {
-          
                     NodeOperator.NodeOperator newNode = new NodeOperator.NodeOperator(node);
 
                     Thread t1 = new Thread(new ThreadStart(newNode.nodeCommunication));
@@ -89,7 +94,7 @@ namespace ProcessCreationService
                     nodeThreads.Add(pass, t1);    /*operatorID should be the machine IP*/
 
                     INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator), pass);
-
+                    OPtoNodes[node.OperatorID].Add(pass);
                     nodeOperators.Add(pass, nodeOp);  /*operatorID should be the machine IP*/
                 }
                 IsStarted = true;
@@ -97,6 +102,24 @@ namespace ProcessCreationService
             return IsStarted;
         }
 
+        public void start(string v)
+        {
+            foreach(var node in OPtoNodes[v])
+            {
+                //INodeOperator nodeOp = nodeOperators[node];
+                //nodeOp.makeNodeWork();
+                //AsyncCallback asyncCallback = new AsyncCallback(testCallBack);
+                //nodeReplicationAsync remoteDel = new nodeReplicationAsync(nodeOp.makeNodeWork);
+                //IAsyncResult ar = remoteDel.BeginInvoke(null,
+                //                            asyncCallback, null);
+
+            }
+        }
+
+        public void testCallBack(IAsyncResult ar)
+        {
+
+        }
         public string crash(string operatorID)
         {
             try
@@ -109,7 +132,6 @@ namespace ProcessCreationService
                 return "node " + operatorID + " does not exist!";
             }
         }
-
         public string freeze(string operatorID)
         {
             try

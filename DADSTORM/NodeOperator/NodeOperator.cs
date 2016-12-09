@@ -53,7 +53,7 @@ namespace NodeOperator
         }
 
         public void makeNodeWork() {
-            nodeDoWork.BeginInvoke(null,null);
+            //nodeDoWork.BeginInvoke(null,null);
         }
 
         public NodeOperator(NodeOperatorData node)
@@ -70,8 +70,8 @@ namespace NodeOperator
                 {
                     downStreamOutput(dw);
                 }
-                siblingsReplication();
             }
+            siblingsReplication();
         }
 
         public void uniqThread()
@@ -173,22 +173,27 @@ namespace NodeOperator
                         object ClassObj = Activator.CreateInstance(type);
 
                         // Dynamically Invoke the method
-                        
-                        object[] args = new object[] { InputTuples };
+
+                        object[] args = new object[] { InputTuples.Select(i => i.Items) };
                         object resultObject = type.InvokeMember("CustomOperation",
                           BindingFlags.Default | BindingFlags.InvokeMethod,
                                null,
                                ClassObj,
                                args);
                         IList<IList<string>> result = (IList<IList<string>>)resultObject;
-                        Console.WriteLine("Map call result was: ");
-                        foreach (IList<string> tuple in result)
+                        OutputTuples = new List<DADTuple>();
+                        foreach(var res in result)
                         {
-                            Console.Write("tuple: ");
-                            foreach (string s in tuple)
-                                Console.Write(s + " ,");
-                            Console.WriteLine();
+                            OutputTuples.Add(new DADTuple(res.ToArray()));
                         }
+                        //Console.WriteLine("Map call result was: ");
+                        //foreach (IList<string> tuple in result)
+                        //{
+                        //    Console.Write("tuple: ");
+                        //    foreach (string s in tuple)
+                        //        Console.Write(s + " ,");
+                        //    Console.WriteLine();
+                        //}
                         return;
                     }
                 }
@@ -222,6 +227,8 @@ namespace NodeOperator
                     replicateTuplesToNode(down.TargetIPs.First()).makeNodeWork();/*TODO - make it work*/
                     break;
                 case RoutingType.random:
+                    Random rnd1 = new Random();
+                    replicateTuplesToNode(down.TargetIPs[rnd1.Next(down.TargetIPs.Count)]).makeNodeWork();
                     break;
             }
 

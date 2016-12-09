@@ -18,5 +18,6 @@ namespace NodeManager
         string unfreeze(string operatorID);
 
         bool init(List<DADStorm.DataTypes.NodeOperatorData> node);
+        void start(string v);
     }
 }

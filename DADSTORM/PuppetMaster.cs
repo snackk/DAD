@@ -40,7 +40,7 @@ namespace DADSTORM
                 nodeAddressMapping.Add(address, "tcp://localhost:" + portNodes + "/op" + portNodes);
                 portNodes += 1;
             }
-
+            portNodes = 11000;
             foreach (var uniqAddress in pcsaddresses) {     //Iteration over all the PCSs
                 pcsAddressMapping.Add(uniqAddress,"localhost:" + port++);   //Create a mapping for the real (localhost) address
 
@@ -89,6 +89,7 @@ namespace DADSTORM
                         }
                         DADStorm.DataTypes.NodeOperatorData data = new DADStorm.DataTypes.NodeOperatorData()
                         {
+                            OperatorID = ConfigNode.NodeName,
                             ConnectionPort = portNodes++,
                             OperatorName = "op",    //TODO:Change this to come from config
                             TypeofRouting = ConfigNode.Routing,
@@ -148,6 +149,11 @@ namespace DADSTORM
                                                      
 
                             case "start":
+                                var ps = config.getAddressesFromOPName(command[1]);
+                                foreach(var p in ps)
+                                {
+                                    pcsServers[p].start(command[1]);
+                                }
                                 //foreach (var vps in opPcs[command[1]]) {
                                 //    commandRes = vps.start(command[1]);
                                 //}
