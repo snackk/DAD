@@ -10,6 +10,7 @@ using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text.RegularExpressions;
 using static ProcessCreationService.ProcessCreationService;
+using System.IO;
 
 namespace DADSTORM
 {
@@ -72,6 +73,20 @@ namespace DADSTORM
                                 TargetIPs = listOfDownstreamNodes
                             });
                         }
+                        List<string> Opargs;
+                        if (ConfigNode.Operation == DADStorm.DataTypes.OperatorType.custom)
+                        {
+                            byte[] code = File.ReadAllBytes(ConfigNode.OperationArgs[0]);
+                            Opargs = new List<string>()
+                            {
+                                code.ToString(),
+                                ConfigNode.OperationArgs[1]
+                            };
+                        }
+                        else
+                        {
+                            Opargs = ConfigNode.OperationArgs;
+                        }
                         DADStorm.DataTypes.NodeOperatorData data = new DADStorm.DataTypes.NodeOperatorData()
                         {
                             ConnectionPort = portNodes++,
@@ -80,7 +95,7 @@ namespace DADSTORM
                             Siblings = siblings,
                             Downstream = downstream,
                             TypeofOperation = ConfigNode.Operation,
-                            OperationArgs = ConfigNode.OperationArgs
+                            OperationArgs = Opargs
                         };
                         
                         ListOfNodeInformations.Add(data);   //New node that will be created by the PCS
