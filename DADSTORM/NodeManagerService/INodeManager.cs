@@ -9,7 +9,7 @@ namespace NodeManager
 
         string interval(string operatorID, int x_ms);
 
-        string status(string operatorID);
+        string status();
 
         string crash(string operatorID);
 

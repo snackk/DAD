@@ -138,7 +138,7 @@ namespace ProcessCreationService
         {
             try
             {
-                if (nodeThreads[operatorID].IsAlive)
+                if (nodeThreads[operatorID].ThreadState != ThreadState.Suspended)
                 {
                     nodeThreads[operatorID].Suspend();
                     return "node " + operatorID + " is now frozen.";
@@ -148,6 +148,10 @@ namespace ProcessCreationService
             catch (KeyNotFoundException)
             {
                 return "node " + operatorID + " does not exist!";
+            }
+            catch (ThreadStateException)
+            {
+                return "node " + operatorID + " isn't running!";
             }
         }
 
@@ -171,15 +175,22 @@ namespace ProcessCreationService
             return "node " + operatorID + " is frozen for " + x_ms + " seconds.";
         }
 
-        public string status(string operatorID)
+        public string status()
         {
-            try
+            foreach (var de in nodeThreads)
             {
-                return "node " + operatorID + " is " + nodeThreads[operatorID].ThreadState;
+                string output;
+                try
+                {
+                    output = "Node at " + de.Key + " is " + de.Value.ThreadState;
+                    
+                }
+                catch (Exception) {
+                    output = "Node at " + de.Key + " is " + de.Value.ThreadState;
+                }
+                Console.WriteLine(output);
             }
-            catch (KeyNotFoundException) {
-                return "node " + operatorID + " does not exist!";
-            } 
+            return "";
         }
 
         public string unfreeze(string operatorID)

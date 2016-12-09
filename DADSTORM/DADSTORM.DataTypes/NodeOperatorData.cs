@@ -18,6 +18,7 @@ namespace DADStorm.DataTypes
         public List<string> Siblings { get; set; }
         public List<string> OperationArgs { get; set; }
         public string OperatorID { get; set; }
+        public List<DADTuple> Initialtuples { get; set; }
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
