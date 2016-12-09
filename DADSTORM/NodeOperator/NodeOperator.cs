@@ -16,7 +16,10 @@ namespace NodeOperator
         private NodeOperatorData nodeData;
         private List<INodeOperator> replicas { get; set; } = new List<INodeOperator>();
 
+        private List<DADTuple> InputTuples = new List<DADTuple>();
+        private List<DADTuple> OutputTuples = new List<DADTuple>();
         private List<DADTuple> nodeTuples { get; set; } = new List<DADTuple>();
+
         private int replicateDepth = 0;
 
         public delegate bool nodeReplicationAsync(List<DADTuple> replicatedTuples);
@@ -57,10 +60,22 @@ namespace NodeOperator
             nodeData = node;
         }
 
+        public void replicationAndDownstreaming() {
+
+            if (nodeData.TypeofRouting == RoutingType.primary || nodeData.TypeofRouting == RoutingType.random)
+            {
+                foreach (Downstream dw in nodeData.Downstream)
+                {
+                    downStreamOutput(dw);
+                }
+                siblingsReplication();
+            }
+        }
+
         public void uniqThread()
         {
             bool isccurrentUnique = true;
-            List<DADTuple> Output = new List<DADTuple>();
+           
 
             for (int i = 0; i < nodeTuples.Count; i++)
             {
@@ -74,26 +89,28 @@ namespace NodeOperator
                     }
                 }
                 if (isccurrentUnique)
-                    Output.Add(nodeTuples[i]);
+                    OutputTuples.Add(nodeTuples[i]);
 
             }
+            replicationAndDownstreaming();
         }
 
-        List<DADTuple> Input = new List<DADTuple>();
+        
 
         public void countThread()
         {
-            //HACK for templating:
-            var output = Input.Count;
-            if (nodeData.TypeofRouting == RoutingType.primary)
-                replicateTuplesToNode("");
-                
+           
+            OutputTuples[0] = new DADTuple(InputTuples.Count.ToString());
+            replicationAndDownstreaming();
+            
         }
 
         public void dupThread()
         {
-            var output = Input;
-            throw new NotImplementedException();
+            var output = InputTuples;
+            OutputTuples[0] = new DADTuple(output.ToString());
+            replicationAndDownstreaming();
+           
         }
 
         private enum OperationSymbol
@@ -115,13 +132,12 @@ namespace NodeOperator
 
         public void filterThread()
         {
-            throw new NotImplementedException();
             List<string> operargs = new List<string>();
             int index = Convert.ToInt32(operargs[0]);
             OperationSymbol oper = StringToOperation(operargs[1]);
             string value = operargs[2];
 
-            Input.Where(i =>
+            OutputTuples = InputTuples.Where(i =>
             {
                 switch (oper)
                 {
@@ -133,12 +149,16 @@ namespace NodeOperator
                         return i.getIndex(index).CompareTo(value) > 0;
                     default: return false;
                 }
-            });
+            }).ToList();
+
+            replicationAndDownstreaming();
         }
 
         public void customThread()
         {
-            throw new NotImplementedException();
+
+
+            
         }
 
         public void debug() {
@@ -173,7 +193,7 @@ namespace NodeOperator
             INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator), remoteLocation);
             AsyncCallback asyncCallback = new AsyncCallback(this.nodeReplicationCallBack);
             nodeReplicationAsync remoteDel = new nodeReplicationAsync(nodeOp.replicateTuples);
-            IAsyncResult ar = remoteDel.BeginInvoke(nodeTuples,
+            IAsyncResult ar = remoteDel.BeginInvoke(OutputTuples,
                                         asyncCallback, null);
             return nodeOp;
 
