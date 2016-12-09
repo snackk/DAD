@@ -9,6 +9,7 @@ using System.Threading;
 using System.Runtime.Remoting.Channels;
 using System.Runtime.Remoting.Channels.Tcp;
 using System.Text.RegularExpressions;
+using DADStorm.DataTypes;
 using static ProcessCreationService.ProcessCreationService;
 using System.IO;
 
@@ -73,6 +74,13 @@ namespace DADSTORM
                                 TargetIPs = listOfDownstreamNodes
                             });
                         }
+                        List<DADTuple> initialTuples;
+                        if (ConfigNode.TargetData.Contains("."))
+                        {
+                            initialTuples = DADTuple.InputFileReader(ConfigNode.TargetData);
+                        }
+                        else initialTuples = new List<DADTuple>();
+
                         List<string> Opargs;
                         if (ConfigNode.Operation == DADStorm.DataTypes.OperatorType.custom)
                         {
@@ -96,7 +104,8 @@ namespace DADSTORM
                             Siblings = siblings,
                             Downstream = downstream,
                             TypeofOperation = ConfigNode.Operation,
-                            OperationArgs = Opargs
+                            OperationArgs = Opargs,
+                            Initialtuples = initialTuples
                         };
                         
                         ListOfNodeInformations.Add(data);   //New node that will be created by the PCS
@@ -141,50 +150,57 @@ namespace DADSTORM
 
                 try
                 {
-                    if (command[1] != "")
+                    List<string> psCandidate = null;
+                    List<string> nodeCandidate = null;
+                    switch (command[0])
                     {
-                   
-                        switch (command[0])
-                        {
-                                                     
+                        case "start":
+                            psCandidate = config.getAddressesFromOPName(command[1]);
+                            var res = psCandidate.First();
+                            pcsServers[res].start(command[1]);
+                            //foreach (var p in ps)
+                            //{
+                            //    pcsServers[p].start(command[1]);
+                            //}
 
-                            case "start":
-                                var ps = config.getAddressesFromOPName(command[1]);
-                                foreach(var p in ps)
-                                {
-                                    pcsServers[p].start(command[1]);
-                                }
-                                //foreach (var vps in opPcs[command[1]]) {
-                                //    commandRes = vps.start(command[1]);
-                                //}
-                                
-                                
-                                break;
+                            break;
 
-                            case "status":
-                                commandRes = currentPcs.status(command[1]);
-                                break;
+                        case "status":
+                            foreach (var pcss in pcsServers.Select(i => i.Value))
+                            {
+                                pcss.status();
+                            }
+                            break;
 
-                            case "interval":
-                                commandRes = currentPcs.interval(command[1],Int32.Parse(command[2]));
-                                break;
+                        case "interval":
+                            commandRes = currentPcs.interval(command[1], Int32.Parse(command[2]));
+                            break;
 
-                            case "crash":
-                                commandRes = currentPcs.crash(command[1]);
-                                break;
+                        case "crash":
+                            psCandidate = config.getAddressesFromOPName(command[1]);
+                            nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
+                            var toCrash = psCandidate[Convert.ToInt32(command[2])];
+                            pcsServers[toCrash].crash(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
+                            break;
 
-                            case "freeze":
-                                commandRes = currentPcs.freeze(command[1]);
-                                break;
+                        case "freeze":
+                            psCandidate = config.getAddressesFromOPName(command[1]);
+                            nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
+                            var toFreeze = psCandidate[Convert.ToInt32(command[2])];
+                            pcsServers[toFreeze].freeze(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
+                            break;
 
-                            case "unfreeze":
-                                commandRes = currentPcs.unfreeze(command[1]);
-                                break;
-                        }
-                        Console.WriteLine(commandRes);
+                        case "unfreeze":
+                            psCandidate = config.getAddressesFromOPName(command[1]);
+                            nodeCandidate = config.ConfigurationNodes.Where(i => i.NodeName == command[1]).SelectMany(n => n.Addresses).ToList();
+                            var toThaw = psCandidate[Convert.ToInt32(command[2])];
+                            pcsServers[toThaw].freeze(nodeAddressMapping[nodeCandidate[Convert.ToInt32(command[2])]]);
+                            break;
                     }
+                    Console.WriteLine(commandRes);
                 }
-                catch (IndexOutOfRangeException) {
+                catch (IndexOutOfRangeException)
+                {
 
                 }
             }

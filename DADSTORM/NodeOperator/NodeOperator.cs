@@ -16,10 +16,9 @@ namespace NodeOperator
     {
         private int portN { set; get; }
         private NodeOperatorData nodeData;
-
-        private List<DADTuple> InputTuples = new List<DADTuple>();
+        
         private List<DADTuple> OutputTuples = new List<DADTuple>();
-        private List<DADTuple> nodeTuples { get; set; } = new List<DADTuple>();
+        private List<DADTuple> InputTuples { get; set; } = new List<DADTuple>();
 
         private int replicateDepth = 0;
 
@@ -30,12 +29,13 @@ namespace NodeOperator
         public NodeOperator(NodeOperatorData node) {
             portN = node.ConnectionPort;
             nodeData = node;
+            InputTuples = node.Initialtuples;
 
             OperatorType ot = nodeData.TypeofOperation;
             switch (nodeData.TypeofOperation) {
 
                 case OperatorType.count:
-                    nodeDoWork =  new doWork(countThread);
+                    nodeDoWork = new doWork(countThread);
                     break;
                 case OperatorType.custom:
                     nodeDoWork = new doWork(customThread);
@@ -73,19 +73,19 @@ namespace NodeOperator
             bool isccurrentUnique = true;
            
 
-            for (int i = 0; i < nodeTuples.Count; i++)
+            for (int i = 0; i < InputTuples.Count; i++)
             {
                 isccurrentUnique = true;
-                for (int j = i + 1; j < nodeTuples.Count; j++)
+                for (int j = i + 1; j < InputTuples.Count; j++)
                 {
-                    if (nodeTuples[i].Equals(nodeTuples[j]))
+                    if (InputTuples[i].Equals(InputTuples[j]))
                     {
                         isccurrentUnique = false;
                         break;
                     }
                 }
                 if (isccurrentUnique)
-                    OutputTuples.Add(nodeTuples[i]);
+                    OutputTuples.Add(InputTuples[i]);
 
             }
             replicationAndDownstreaming();
@@ -128,21 +128,19 @@ namespace NodeOperator
 
         public void filterThread()
         {
-            List<string> operargs = new List<string>();
-            int index = Convert.ToInt32(operargs[0]);
-            OperationSymbol oper = StringToOperation(operargs[1]);
-            string value = operargs[2];
-
+            int index = Convert.ToInt32(nodeData.OperationArgs[0]);
+            OperationSymbol oper = StringToOperation(nodeData.OperationArgs[1]);
+            string value = nodeData.OperationArgs[2];
             OutputTuples = InputTuples.Where(i =>
             {
                 switch (oper)
                 {
                     case OperationSymbol.equals:
-                        return i.getIndex(index).Equals(value);
+                        return i.getIndex(index-1).Equals(value);
                     case OperationSymbol.lesser:
-                        return i.getIndex(index).CompareTo(value) < 0;
+                        return i.getIndex(index-1).CompareTo(value) < 0;
                     case OperationSymbol.greater:
-                        return i.getIndex(index).CompareTo(value) > 0;
+                        return i.getIndex(index-1).CompareTo(value) > 0;
                     default: return false;
                 }
             }).ToList();
@@ -257,7 +255,7 @@ namespace NodeOperator
         }
 
         public bool replicateTuples(List<DADTuple> replicatedTuples) {
-            nodeTuples.AddRange(replicatedTuples);
+            InputTuples.AddRange(replicatedTuples);
             replicateDepth++;
             /*if(replicateDepth == LISTA_NEVES.length)*/
             return true;
