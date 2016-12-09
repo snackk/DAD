@@ -12,5 +12,9 @@ namespace NodeOperator
         void filterThread();
         void customThread();
         bool replicateTuples(List<DADTuple> replicatedTuples);
+        void freeze();
+        void unfreeze();
+        void crash();
+        string status();
     }
 }

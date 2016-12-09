@@ -9,6 +9,7 @@ using DADStorm.DataTypes;
 using System.Linq;
 using System.Text;
 using System.Reflection;
+using System.Threading;
 
 namespace NodeOperator
 {
@@ -25,6 +26,40 @@ namespace NodeOperator
         public delegate bool nodeReplicationAsync(List<DADTuple> replicatedTuples);
         public delegate void doWork();
         public doWork nodeDoWork { get; set; } = null;
+        private bool _isstopped = false;
+        private object IsStoppedLock = new object();
+        public bool IsStopped
+        {
+            get
+            {
+                return _isstopped;
+            }
+            set
+            {
+                if (value == true)
+                    lock (IsStoppedLock)
+                    {
+                        _isstopped = value;
+                    }
+            }
+        }
+
+        private bool _isfrozen = false;
+        private object IsFrozenLock = new object();
+        public bool IsFrozen
+        {
+            get
+            {
+                return _isfrozen;
+            }
+            set
+            {
+                lock (IsFrozenLock)
+                {
+                    _isfrozen = value;
+                }
+            }
+        }
 
         public NodeOperator(NodeOperatorData node) {
             portN = node.ConnectionPort;
@@ -70,6 +105,7 @@ namespace NodeOperator
 
         public void uniqThread()
         {
+            checkNodeState();
             bool isccurrentUnique = true;
            
 
@@ -95,7 +131,7 @@ namespace NodeOperator
 
         public void countThread()
         {
-           
+            checkNodeState();
             OutputTuples[0] = new DADTuple(InputTuples.Count.ToString());
             replicationAndDownstreaming();
             
@@ -103,6 +139,7 @@ namespace NodeOperator
 
         public void dupThread()
         {
+            checkNodeState();
             var output = InputTuples;
             OutputTuples[0] = new DADTuple(output.ToString());
             replicationAndDownstreaming();
@@ -126,8 +163,24 @@ namespace NodeOperator
             }
         }
 
+        public void crash()
+        {
+            IsStopped = true;
+        }
+
+        public void freeze()
+        {
+            IsFrozen = true;
+        }
+
+        public void unfreeze()
+        {
+            IsFrozen = false;
+        }
+
         public void filterThread()
         {
+            checkNodeState();
             int index = Convert.ToInt32(nodeData.OperationArgs[0]);
             OperationSymbol oper = StringToOperation(nodeData.OperationArgs[1]);
             string value = nodeData.OperationArgs[2];
@@ -148,8 +201,26 @@ namespace NodeOperator
             replicationAndDownstreaming();
         }
 
+        private bool isUnfrozen()
+        {
+            return !IsFrozen;
+        }
+
+        private void checkNodeState()
+        {
+            if (IsStopped)
+            {
+                System.Threading.Thread.CurrentThread.Abort();
+            }
+            if (IsFrozen)
+            {
+                SpinWait.SpinUntil(isUnfrozen);
+            }
+        }
+
         public void customThread()
         {
+            checkNodeState();
             byte[] code = Encoding.ASCII.GetBytes(nodeData.OperationArgs[0]);
             string className = nodeData.OperationArgs[1];
 
@@ -250,8 +321,6 @@ namespace NodeOperator
             bool p = false;
             nodeReplicationAsync rad = (nodeReplicationAsync)((AsyncResult)ar).AsyncDelegate;
             p = (bool)rad.EndInvoke(ar);
-
-               
         }
 
         public bool replicateTuples(List<DADTuple> replicatedTuples) {
@@ -259,6 +328,22 @@ namespace NodeOperator
             replicateDepth++;
             /*if(replicateDepth == LISTA_NEVES.length)*/
             return true;
+        }
+
+        public string status()
+        {
+            string output = "Thread is ";
+            if (IsStopped)
+            {
+                output += "stopped.";
+                return output;
+            }
+            if (IsFrozen)
+            {
+                output += "frozen";
+                return output;
+            }
+            return output + "running";
         }
     }
 }

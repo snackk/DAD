@@ -126,7 +126,7 @@ namespace ProcessCreationService
         {
             try
             {
-                nodeThreads[operatorID].Abort();
+                nodeOperators[operatorID].crash();
                 return "node " + operatorID + " was crashed.";
             }
             catch (KeyNotFoundException)
@@ -138,12 +138,9 @@ namespace ProcessCreationService
         {
             try
             {
-                if (nodeThreads[operatorID].ThreadState != ThreadState.Suspended)
-                {
-                    nodeThreads[operatorID].Suspend();
-                    return "node " + operatorID + " is now frozen.";
-                }
-                return "node " + operatorID + " was already frozen.";
+                nodeOperators[operatorID].freeze();
+                return "node " + operatorID + " is now frozen.";
+//                return "node " + operatorID + " was already frozen.";
             }
             catch (KeyNotFoundException)
             {
@@ -177,16 +174,16 @@ namespace ProcessCreationService
 
         public string status()
         {
-            foreach (var de in nodeThreads)
+            foreach (var de in nodeOperators)
             {
                 string output;
                 try
                 {
-                    output = "Node at " + de.Key + " is " + de.Value.ThreadState;
+                    output = "Node at " + de.Key + " is " + de.Value.status();
                     
                 }
                 catch (Exception) {
-                    output = "Node at " + de.Key + " is " + de.Value.ThreadState;
+                    output = "Node at " + de.Key + " is " + de.Value.status();
                 }
                 Console.WriteLine(output);
             }
