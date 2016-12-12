@@ -11,7 +11,7 @@ namespace DADSTORM
 {
     class Logger : MarshalByRefObject, ILogger
     {
-        private const string LogFile = "log.txt";
+        private string LogFile = PuppetSettings.Default.LogFile;
         public delegate void AsyncMethodCaller(params string[] logLines);
 
         public Logger()

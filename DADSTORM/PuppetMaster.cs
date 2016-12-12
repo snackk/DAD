@@ -27,7 +27,7 @@ namespace DADSTORM
         static void Main(string[] args)
         {
 
-            var config = new DataTypes.ConfigurationFileObject("test.config"); //Use this to read configuration files.
+            var config = new DataTypes.ConfigurationFileObject(PuppetSettings.Default.ConfigFile); //Use this to read configuration files.
             //var v = DataTypes.ConfigurationFileObject.ReadConfig("Test.config"); //or this
             var pcsaddresses = config.ConfigurationNodes.SelectMany(i => i.PCSAddress).Distinct().ToList();
             
