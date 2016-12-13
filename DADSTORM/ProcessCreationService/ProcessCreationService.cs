@@ -95,6 +95,7 @@ namespace ProcessCreationService
                     nodeThreads.Add(pass, t1);    /*operatorID should be the machine IP*/
 
                     INodeOperator nodeOp = (INodeOperator)Activator.GetObject(typeof(INodeOperator), pass);
+                    GC.KeepAlive(nodeOp);
                     OPtoNodes[node.OperatorID].Add(pass);
                     nodeOperators.Add(pass, nodeOp);  /*operatorID should be the machine IP*/
                 }

@@ -315,7 +315,7 @@ namespace NodeOperator
         {
             if (LogTuples)
             {
-                ILogger nodeOp = (ILogger)Activator.GetObject(typeof(INodeOperator), "tcp://localhost:9999/logger");
+                ILogger nodeOp = (ILogger)Activator.GetObject(typeof(ILogger), "tcp://localhost:9999/logger");
                 List<string> input = new List<string>();
                 OutputTuples.ForEach(i => input.Add("tuple " + nodeData.NodeAddress + ", " + i.ToString()));
                 nodeOp.logAsync(input.ToArray());

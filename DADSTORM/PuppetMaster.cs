@@ -120,6 +120,7 @@ namespace DADSTORM
                 //}
 
                 var bo = pcs.init(ListOfNodeInformations);
+                GC.KeepAlive(pcs);
                 pcsServers.Add(uniqAddress, pcs);
             }
 
@@ -129,11 +130,11 @@ namespace DADSTORM
                 typeof(Logger),
                 "logger",
                     System.Runtime.Remoting.WellKnownObjectMode.Singleton);
-            System.Console.WriteLine("Logging Service open on port: " + port);
+            System.Console.WriteLine("Logging Service open on port: 9999");
 
-            ILogger Logger = (ILogger)Activator.GetObject(typeof(INodeOperator), "tcp://localhost:9999/logger");
+            ILogger Logger = (ILogger)Activator.GetObject(typeof(ILogger), "tcp://localhost:9999/logger");
             //var test = config.ConfigurationNodes.Where(i => i.NodeName == "OP1").ToList().First().PCSAddress.First();
-
+            GC.KeepAlive(Logger);
 
 
             /*    if (pcsLocalhost == null) {
