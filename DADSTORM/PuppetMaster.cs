@@ -38,9 +38,9 @@ namespace DADSTORM
             int port = 10000;
             int portNodes = 11000;
 
-            foreach (var address in config.ConfigurationNodes.SelectMany(i => i.Addresses))
+            foreach (var address in config.ConfigurationNodes.SelectMany(i => i.Addresses))   //Config node = details of one operation
             {
-                nodeAddressMapping.Add(address, "tcp://localhost:" + portNodes + "/op" + portNodes);
+                nodeAddressMapping.Add(address, "tcp://localhost:" + portNodes + "/op" + portNodes);  //Creates the same mapping but for the nodes instead of the pcs
                 portNodes += 1;
             }
             portNodes = 11000;
@@ -112,7 +112,7 @@ namespace DADSTORM
                             LogTuples = (config.Logging == DataTypes.LoggingLevel.full)
                         };
                         
-                        ListOfNodeInformations.Add(data);   //New node that will be created by the PCS
+                        ListOfNodeInformations.Add(data);   //New node that will be created by the PCS with the data stated right up here.
                     }
                 }
                 //DADStorm.DataTypes.NodeOperatorData nop = new DADStorm.DataTypes.NodeOperatorData()
